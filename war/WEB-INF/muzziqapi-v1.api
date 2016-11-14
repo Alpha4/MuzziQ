@@ -1,0 +1,89 @@
+{
+  "extends" : "thirdParty.api",
+  "abstract" : false,
+  "root" : "https://coral-147014.appspot.com/_ah/api",
+  "name" : "muzziqapi",
+  "version" : "v1",
+  "description" : "An API to manage music quizzes",
+  "defaultVersion" : false,
+  "discovery" : [ "PUBLIC" ],
+  "adapter" : {
+    "bns" : "https://coral-147014.appspot.com/_ah/spi",
+    "deadline" : 65.0,
+    "type" : "lily"
+  },
+  "auth" : {
+    "allowCookieAuth" : false
+  },
+  "frontendLimits" : {
+    "unregisteredUserQps" : -1,
+    "unregisteredQps" : -1,
+    "unregisteredDaily" : -1,
+    "rules" : [ ]
+  },
+  "cacheControl" : {
+    "type" : "no-cache",
+    "maxAge" : 0
+  },
+  "methods" : {
+    "muzziqapi.getQuizz" : {
+      "path" : "quizz",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
+      "request" : {
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    }
+  },
+  "descriptor" : {
+    "schemas" : {
+      "Quizz" : {
+        "id" : "Quizz",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "questions" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "Question"
+            }
+          }
+        }
+      },
+      "Question" : {
+        "id" : "Question",
+        "type" : "object",
+        "properties" : {
+          "id" : {
+            "type" : "integer"
+          },
+          "content" : {
+            "type" : "string"
+          },
+          "answers" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      }
+    },
+    "methods" : {
+      "com.muzziq.api.MuzziQAPI.getQuizz" : {
+        "response" : {
+          "$ref" : "Quizz"
+        }
+      }
+    }
+  }
+}
