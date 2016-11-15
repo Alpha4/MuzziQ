@@ -6,17 +6,18 @@ import java.util.List;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.muzziq.utils.Quizz;
+import com.muzziq.utils.QTemplate;
 import com.muzziq.utils.Question;
 
 @Api(name="muzziqapi",version="v1", description="An API to manage music quizzes")
 public class MuzziQAPI {
 	
-	private List<String> templates = new ArrayList<String>();
-	//private List<Question> questions = new ArrayList<Question>();
+	private List<QTemplate> templates = new ArrayList<QTemplate>();
+	private List<Question> questions = new ArrayList<Question>();
 	
 	public MuzziQAPI(){
-		this.templates.add("Quel chanteur a composé %%var%%?");
-		this.templates.add("Quel chanteur a composé %%var%% et %%var%%?");
+		this.templates.add(new QTemplate("Chanson","Artist","Quel chanteur a composé %%var%%?"));
+		this.templates.add(new QTemplate("Chanson","Artist","Quel chanteur a composé %%var%% et %%var%%?"));
 	}
 	
 	//Logic to retrieve from the datastore variables to replace in the templates along with a list of answers

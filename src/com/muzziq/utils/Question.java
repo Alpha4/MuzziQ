@@ -11,51 +11,35 @@ public class Question {
 	private int id;
 	private String content;
 	private List<String> variables;
-	private String template;
+	private QTemplate template;
 	
 	private List<String> answers;
 	
-	public Question(int id, String template, List<String> vars, List<String> answers) throws RuntimeException{
+	public Question(int id, QTemplate template, List<String> vars, List<String> answers) throws RuntimeException{
 		this.id = id;
 		int nb = vars.size();
-		int vnb = this.getVarNb(template);
+		int vnb = template.getVarNb();
 		if(nb != vnb){
 			throw new RuntimeException("the number of variables in the template does not correspond with the nb of var in the list");
 		}
 		this.variables = vars;
 		this.template = template;
-		this.buildQuestion();
+		this.content = this.buildQuestion();
 		this.answers = answers;
-		this.content = this.template;
 	}
 	
-	private int getVarNb(String template){
-		boolean end = false;
-		int counter = 0;
-		String str = template;
-		while(!end){
-			int index = str.indexOf("%%var%%");
-			if(index == -1){
-				end = true;
-			}
-			else{
-				counter++;
-				str = str.substring(index + 7);
-			}
-		}
-		return counter;
-	}
 	
-	private void buildQuestion(){
+	private String buildQuestion(){
 		//System.out.println("entering the building function");
+		String template = this.template.getTemplate();
 		String res = null;
 		for(int i=0;i<this.variables.size();i++){
 			this.variables.get(i);
-			res = this.template.replaceFirst("%%var%%", variables.get(i));
+			res = template.replaceFirst("%%var%%", variables.get(i));
 			//System.out.println(i+" "+ res);
-			this.template = res;
+			template = res;
 		}
-		//System.out.println(res);
+		return res;
 		
 	}
 	
@@ -78,10 +62,6 @@ public class Question {
 	
 	public String getContent(){
 		return this.content;
-	}
-	
-	public String toString(){
-		return template;
 	}
 	
 		
