@@ -8,11 +8,19 @@ public class Question {
 	//In the question template %%var%% represents a variable
 	// Ex: " En quelle année l'album %%var%% est-il sorti? " 
 	
+	//attribut id sera remplacé par l'id du row du datastore d'où les variables qui completent le template sont sorties
 	private int id;
+	
+	//contenu final de la question apres substitution de variables
 	private String content;
+	
+	//liste des variables a substituer dans le template de la question
 	private List<String> variables;
+	
+	//template qui est la base de cette question
 	private QTemplate template;
 	
+	//liste des reponses à cette questions :  une correcte et trois incorrectes ? 
 	private List<String> answers;
 	
 	public Question(int id, QTemplate template, List<String> vars, List<String> answers) throws RuntimeException{
@@ -28,7 +36,10 @@ public class Question {
 		this.answers = answers;
 	}
 	
-	
+	/**
+	 * 
+	 * @return la question complete sans vides
+	 */
 	private String buildQuestion(){
 		//System.out.println("entering the building function");
 		String template = this.template.getTemplate();
@@ -43,6 +54,9 @@ public class Question {
 		
 	}
 	
+	/**
+	 * methode permettant de melanger les responses
+	 */
 	private void shuffleAnswers(){
 		Collections.shuffle(this.answers);
 	}

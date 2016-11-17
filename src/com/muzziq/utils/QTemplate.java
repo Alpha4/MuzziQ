@@ -1,9 +1,12 @@
 package com.muzziq.utils;
 
 public class QTemplate {
+	//atribut permetant de connaitre quelle types de variables il faut chercher dans le datastore pour les remlpacer dans le template
 	private String infoProvided;
+	//atribut permetant de conaitre le type de variables qui sont dans les reponses
 	private String infoDemanded;
 	
+	//template contenant la sequence de caracteres %%var%% designant une variable
 	private String template;
 	
 	public QTemplate(String infoProvided, String infoDemanded, String template){
@@ -36,6 +39,10 @@ public class QTemplate {
 		this.template = template;
 	}
 	
+	/**
+	 * 
+	 * @return le nombre des variables qu'il faut remplacer dans le template
+	 */
 	public int getVarNb(){
 		boolean end = false;
 		int counter = 0;
