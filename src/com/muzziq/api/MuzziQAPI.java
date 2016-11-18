@@ -47,7 +47,6 @@ public class MuzziQAPI {
 	 */
 	
 	//TODO finir les autres cas du switch apres avoir rajouté les templates
-	//TODO corriger erreur --- il peut y avoir des responses identiques parmi les mauvaises responses
 	
 	@SuppressWarnings("unchecked")
 	private void createQuestion(QTemplate template){
@@ -55,7 +54,9 @@ public class MuzziQAPI {
 		switch(template.getInfoProvided()){
 		case "Chanson":{
 			Random r = new Random();
-			int id = r.nextInt(5);
+			List<Integer> ids = new ArrayList<Integer>();
+			int id = r.nextInt(6);
+			ids.add(id);
 			
 			Filter filter = new FilterPredicate("id", FilterOperator.EQUAL, id);
 			Query q = new Query("QuestionVars").setFilter(filter);
@@ -63,7 +64,7 @@ public class MuzziQAPI {
 			Entity entity = pq.asSingleEntity();
 			
 			ArrayList<String> songs = (ArrayList<String>) entity.getProperty("Songs");
-			String song = songs.get(r.nextInt(songs.size()-1));
+			String song = songs.get(r.nextInt(songs.size()));
 			List<String> vars = new ArrayList<String>();
 			vars.add(song);
 			
@@ -73,14 +74,15 @@ public class MuzziQAPI {
 			
 			int i=0;
 			while(i<3){
-				int id1 = r.nextInt(5);
-				if(id1 != id){
+				int id1 = r.nextInt(6);
+				if(!ids.contains(id1)){
 					Filter filter1 = new FilterPredicate("id", FilterOperator.EQUAL, id1);
 					Query q1 = new Query("QuestionVars").setFilter(filter1);
 					PreparedQuery pq1 = datastore.prepare(q1);
 					Entity entity1 = pq1.asSingleEntity();
 					String badAnswer = (String) entity1.getProperty("Artist");
 					answers.add(badAnswer);
+					ids.add(id1);
 					i++;
 				}
 			}
