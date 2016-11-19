@@ -56,6 +56,9 @@
             "items" : {
               "$ref" : "Question"
             }
+          },
+          "genre" : {
+            "type" : "string"
           }
         }
       },
