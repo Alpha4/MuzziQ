@@ -6,15 +6,18 @@ import java.util.List;
 public class Quizz {
 	private int id;
 	private List<Question> questions;
+	private String genre;
 	
-	public Quizz(int id, List<Question> questions){
+	public Quizz(int id, List<Question> questions, String genre){
 		this.id = id;
 		this.questions = questions;
+		this.setGenre(genre);
 	}
 	
-	public Quizz(int id){
+	public Quizz(int id, String genre){
 		this.id = id;
 		this.questions = new ArrayList<Question>();
+		this.genre = genre;
 	}
 	
 	public void addQuestion(Question question){
@@ -30,6 +33,14 @@ public class Quizz {
 	}
 	public void setId(int id){
 		this.id = id;
+	}
+
+	public String getGenre() {
+		return genre;
+	}
+
+	public void setGenre(String genre) {
+		this.genre = genre;
 	}
 	
 }
