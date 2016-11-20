@@ -21,6 +21,7 @@ import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
+import com.google.appengine.api.memcache.Stats;
 import com.muzziq.utils.Quizz;
 import com.muzziq.utils.QTemplate;
 import com.muzziq.utils.Question;
@@ -56,6 +57,20 @@ public class MuzziQAPI {
 		this.templates.add(new QTemplate("Nationalité","Artist","Lequel de ces artists est de nationalité %%var%%?"));
 	}
 	
+	
+	private boolean isMemcacheValid(String genre){
+		Entity e = (Entity) syncCache.get(0);
+		if(e == null){
+			return false;
+		}else{
+			String actualGenre = (String) e.getProperty("Genre");
+			if(actualGenre == genre){
+				return true;
+			}else{
+				return false;
+			}
+		}
+	}
 	
 	
 	private List<Integer> putEntitiesInCache(List<Entity> genreEntities){
@@ -167,8 +182,18 @@ public class MuzziQAPI {
 	@ApiMethod(name="getQuizz")
 	public Quizz getQuizz(@Named("Genre") String genre){
 		Quizz myQuizz = new Quizz(1,genre);
+		List<Integer> listKeys;
+		if(!this.isMemcacheValid(myQuizz.getGenre())){
+			listKeys = this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
+		}else{
+			Stats s = syncCache.getStatistics();
+			long size = s.getItemCount();
+			listKeys = new ArrayList<Integer>();
+			for(int i = 0;i<size;i++){
+				listKeys.add(i);
+			}
+		}
 		
-		List<Integer> listKeys = this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
 		this.questions.clear();
 		
 		for(int i=0;i<this.templates.size();i++){
