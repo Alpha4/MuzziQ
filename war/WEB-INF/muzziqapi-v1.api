@@ -27,7 +27,7 @@
   },
   "methods" : {
     "muzziqapi.getQuizz" : {
-      "path" : "quizz",
+      "path" : "quizz/{Genre}",
       "httpMethod" : "GET",
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
@@ -35,6 +35,12 @@
       "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
       "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
       "request" : {
+        "parameters" : {
+          "Genre" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
         "body" : "empty"
       },
       "response" : {

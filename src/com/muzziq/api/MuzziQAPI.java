@@ -10,14 +10,12 @@ import java.util.logging.Logger;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
+import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
-import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
-import com.google.appengine.api.datastore.Query.CompositeFilter;
-import com.google.appengine.api.datastore.Query.CompositeFilterOperator;
 import com.google.appengine.api.datastore.Query.Filter;
 import com.google.appengine.api.datastore.Query.FilterOperator;
 import com.google.appengine.api.datastore.Query.FilterPredicate;
@@ -39,12 +37,23 @@ public class MuzziQAPI {
 	/***
 	 * Dans le constructeur de cette classe on peut rajouter les templates de questions
 	 * QTemplate(String infoProvided ,String infoDemanded ,String template)
+	 * 
+	 * Pour rajouter des questions rajouter une QTemplate supplementaire!!
+	 * infoProvided et infoDemanded doivent etre des noms de propriétés dans la datastore
+	 * comme Artist, Année, Single, Album, Nationalité
+	 * 
+	 * Les questions avec plusieurs variables ne marchent pas encore
 	 */
 	
-	//TODO completer avec les autres templates
-	
 	public MuzziQAPI(){
-		this.templates.add(new QTemplate("Single","Artist","Quel chanteur a composé %%var%%?"));
+		this.templates.add(new QTemplate("Single","Artist","Quel artist a composé le single %%var%%?"));
+		this.templates.add(new QTemplate("Album","Artist","Quel artist a composé l'album %%var%%?"));
+		this.templates.add(new QTemplate("Année","Single", "Quel single est apparu en %%var%%?"));
+		this.templates.add(new QTemplate("Année", "Album", "Quel album est apparu en %%var%%?"));
+		this.templates.add(new QTemplate("Artist","Single", "Lequel de ces singles est publié par %%var%%"));
+		this.templates.add(new QTemplate("Artist","Album", "Lequel de ces albums est publié par %%var%%?"));
+		this.templates.add(new QTemplate("Artist","Nationalité","De quelle nationalité est l'artist %%var%%?"));
+		this.templates.add(new QTemplate("Nationalité","Artist","Lequel de ces artists est de nationalité %%var%%?"));
 	}
 	
 	
@@ -129,13 +138,17 @@ public class MuzziQAPI {
 			}else{
 				Entity bentity = (Entity) this.syncCache.get(bid);
 				String banswer = (String) bentity.getProperty(answerContext);
-				int badid = (int) bentity.getKey().getId();
-				
-				ids.add(badid);
-				localids.add(bid);
-				answers.add(banswer);
-				
-				i++;
+				if(answers.contains(banswer)){
+					continue;
+				}else{
+					int badid = (int) bentity.getKey().getId();
+					
+					ids.add(badid);
+					localids.add(bid);
+					answers.add(banswer);
+					
+					i++;
+				}
 			}
 		}
 		
@@ -152,8 +165,8 @@ public class MuzziQAPI {
 	 */
 	
 	@ApiMethod(name="getQuizz")
-	public Quizz getQuizz(){
-		Quizz myQuizz = new Quizz(1,"Rock");
+	public Quizz getQuizz(@Named("Genre") String genre){
+		Quizz myQuizz = new Quizz(1,genre);
 		
 		List<Integer> listKeys = this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
 		this.questions.clear();
