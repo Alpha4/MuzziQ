@@ -61,12 +61,16 @@ public class MuzziQAPI {
 	private boolean isMemcacheValid(String genre){
 		Entity e = (Entity) syncCache.get(0);
 		if(e == null){
+			logger.log(Level.INFO,"entity0 en memcache is null");
 			return false;
 		}else{
 			String actualGenre = (String) e.getProperty("Genre");
-			if(actualGenre == genre){
+			logger.log(Level.INFO,"entity0 in memcache is not null checking if genre is correct ...");
+			if(actualGenre.equals(genre)){
+				logger.log(Level.INFO, "the genre is the same");
 				return true;
 			}else{
+				logger.log(Level.INFO, "the genre is not the same");
 				return false;
 			}
 		}
@@ -183,9 +187,12 @@ public class MuzziQAPI {
 	public Quizz getQuizz(@Named("Genre") String genre){
 		Quizz myQuizz = new Quizz(1,genre);
 		List<Integer> listKeys;
+		logger.log(Level.INFO, "checking the memcache ...");
 		if(!this.isMemcacheValid(myQuizz.getGenre())){
+			logger.log(Level.INFO, "memcache not valid; querying datastore");
 			listKeys = this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
 		}else{
+			logger.log(Level.INFO, "memcache valid; nothing to do ...");
 			Stats s = syncCache.getStatistics();
 			long size = s.getItemCount();
 			listKeys = new ArrayList<Integer>();
@@ -203,5 +210,4 @@ public class MuzziQAPI {
 		return myQuizz;
 		
 	}
-
 }
