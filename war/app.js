@@ -20,9 +20,6 @@ function init(){
 
 
 
-/*TODO complete the functions calling our api by replacing name_api, name_function and implementing execute() and
-add other necessary functions */
-
 app.controller('questionsControler',['$scope','$window',function($scope,$windwow){
 
   $scope.getQuizz = function(){
@@ -32,8 +29,6 @@ app.controller('questionsControler',['$scope','$window',function($scope,$windwow
 	  });
   };
 
-
-//TODO replace with our api
 
   window.init = function(){
     console.log("window.init() called");
