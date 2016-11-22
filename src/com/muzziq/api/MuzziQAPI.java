@@ -34,6 +34,7 @@ public class MuzziQAPI {
 	private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private Logger logger = Logger.getLogger("myLogger");
 	private MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
+	private List<String> keys = new ArrayList<String>();
 	
 	/***
 	 * Dans le constructeur de cette classe on peut rajouter les templates de questions
@@ -44,6 +45,9 @@ public class MuzziQAPI {
 	 * comme Artist, Année, Single, Album, Nationalité
 	 * 
 	 * Les questions avec plusieurs variables ne marchent pas encore
+	 * 
+	 * 
+	 * IL FAUT RAJOUTER les genres des singles presentes dans le datastore dans la liste keys!!! 
 	 */
 	
 	public MuzziQAPI(){
@@ -55,54 +59,28 @@ public class MuzziQAPI {
 		this.templates.add(new QTemplate("Artist","Album", "Lequel de ces albums est publié par %%var%%?"));
 		this.templates.add(new QTemplate("Artist","Nationalité","De quelle nationalité est l'artist %%var%%?"));
 		this.templates.add(new QTemplate("Nationalité","Artist","Lequel de ces artists est de nationalité %%var%%?"));
+		this.keys.add("Rock");
+		this.keys.add("Instrumental");
 	}
 	
 	
 	private boolean isMemcacheValid(String genre){
-		Entity e = (Entity) syncCache.get(0);
-		if(e == null){
-			logger.log(Level.INFO,"entity0 en memcache is null");
+		List<Entity> list = (List<Entity>) syncCache.get(genre);
+		if(list == null){
 			return false;
 		}else{
-			String actualGenre = (String) e.getProperty("Genre");
-			logger.log(Level.INFO,"entity0 in memcache is not null checking if genre is correct ...");
-			if(actualGenre.equals(genre)){
-				logger.log(Level.INFO, "the genre is the same");
-				return true;
-			}else{
-				logger.log(Level.INFO, "the genre is not the same");
-				return false;
-			}
+			return true;
 		}
 	}
 	
-	
-	private List<Integer> putEntitiesInCache(List<Entity> genreEntities){
-		List<Integer> list = new ArrayList<Integer>();
-		logger.log(Level.INFO, "genreEntities.size() = "+ genreEntities.size());
-		int key = 0;
-		for(int i=0; i< genreEntities.size();i++){
-			Entity e = (Entity) syncCache.get(key);
+	private void putEntitiesInCache(List<Entity> genreList){
+		String key = (String) genreList.get(0).getProperty("Genre");
+		for(int i=0;i<genreList.size();i++){
+			List<Entity> e = (List<Entity>) syncCache.get(key);
 			if(e == null){
-				logger.log(Level.INFO,"writing in memcache");
-				e = genreEntities.get(i);
-				syncCache.put(key, e);
-				list.add(key);
-				logger.log(Level.INFO, "syncCache("+i+") = " + syncCache.get(key));
-			}else{
-				if(!e.equals(genreEntities.get(i))){
-					logger.log(Level.INFO,"writing in memcache");
-					e=genreEntities.get(i);
-					syncCache.put(key, e);
-					list.add(key);
-					logger.log(Level.INFO, "syncCache("+i+") = " + syncCache.get(key));
-				}else{
-					list.add(key);
-				}
+				syncCache.put(key, genreList);
 			}
-			key++;
 		}
-		return list;
 	}
 	
 	private List<Entity> selectEntitiesByGenre(String genre){
@@ -121,7 +99,7 @@ public class MuzziQAPI {
 		return elist;
 	}
 	
-	private void createQuestion2(QTemplate template,String genre,List<Integer> keys){
+	private void createQuestion2(QTemplate template,String genre){
 		List<Integer> ids = new ArrayList<Integer>(); //id dans datastore
 		List<Integer> localids = new ArrayList<Integer>();//id dans memcache
 		List<String> answers = new ArrayList<String>();
@@ -131,10 +109,13 @@ public class MuzziQAPI {
 		String answerContext = template.getInfoDemanded();
 		Random r = new Random();
 		
-		int size = syncCache.getAll(keys).size();
+		int size = (int) syncCache.getStatistics().getItemCount();
 		logger.log(Level.INFO,"memcache.size() = " + size);
-		int id = r.nextInt(size);
-		Entity correctEntity = (Entity) this.syncCache.get(id);
+		
+		List<Entity> list = (List<Entity>) this.syncCache.get(genre);
+		int id = r.nextInt(list.size());
+		Entity correctEntity = list.get(id);
+		
 		String var = (String) correctEntity.getProperty(varContext);
 		logger.log(Level.INFO, "var =  "+ var);
 		
@@ -151,11 +132,11 @@ public class MuzziQAPI {
 		
 		int i = 0;
 		while(i<3){
-			int bid = r.nextInt(size);
+			int bid = r.nextInt(list.size());
 			if(localids.contains(bid)){
 				continue;
 			}else{
-				Entity bentity = (Entity) this.syncCache.get(bid);
+				Entity bentity = list.get(bid);
 				String banswer = (String) bentity.getProperty(answerContext);
 				if(answers.contains(banswer)){
 					continue;
@@ -186,25 +167,18 @@ public class MuzziQAPI {
 	@ApiMethod(name="getQuizz")
 	public Quizz getQuizz(@Named("Genre") String genre){
 		Quizz myQuizz = new Quizz(1,genre);
-		List<Integer> listKeys;
 		logger.log(Level.INFO, "checking the memcache ...");
 		if(!this.isMemcacheValid(myQuizz.getGenre())){
 			logger.log(Level.INFO, "memcache not valid; querying datastore");
-			listKeys = this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
+			this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
 		}else{
 			logger.log(Level.INFO, "memcache valid; nothing to do ...");
-			Stats s = syncCache.getStatistics();
-			long size = s.getItemCount();
-			listKeys = new ArrayList<Integer>();
-			for(int i = 0;i<size;i++){
-				listKeys.add(i);
-			}
 		}
 		
 		this.questions.clear();
 		
 		for(int i=0;i<this.templates.size();i++){
-			this.createQuestion2(this.templates.get(i),myQuizz.getGenre(), listKeys);
+			this.createQuestion2(this.templates.get(i),myQuizz.getGenre());
 			myQuizz.addQuestion(this.questions.get(i));
 		}
 		return myQuizz;
