@@ -14,51 +14,67 @@ var app = angular.module('app',['ngRoute','ngStorage']).config(['$routeProvider'
 }]);
 
 function init(){
+  console.log("inside init()");
   window.init();
 }
 
 
-
-
-app.controller('questionsControler',['$scope','$window',function($scope,$windwow){
-
-  $scope.getQuizz = function(){
-	  gapi.client.muzziqapi.getQuizz().execute(function(response){
-		  console.log(response);
-		  return response;
-	  });
-  };
-
-
-  window.init = function(){
-    console.log("window.init() called");
-    var rootApi = "https://coral-147014.appspot.com/_ah/api/";
-    gapi.client.load("muzziqapi","v1",function(){
-      console.log("gapi is loaded");
-      $scope.getQuizz();
-    },rootApi);
+app.controller('mainControler',['$scope','$route','$location','$window',function($scope,$route,$location){
+  console.log($location.url());
+  if($location.url() == ""){
+	  $location.path("/main");
   }
+  this.$route = $route;
+  
+  console.log("app controller");
+  
+  
+  $scope.getQuizz = function(genre){
+	  console.log("getquizz method");
+	  var req = gapi.client.muzziqapi.getQuizz({"Genre" : genre});
+	  var resp = req.execute(function(response){
+		  console.log(response);
+		  $scope.questions = response.questions;
+	  });
+	  console.log($scope.questions);
+  };
+  
+  
+  window.init = function(){
+	  console.log("calling window.init()")
+	  var rootApi = "https://coral-147014.appspot.com/_ah/api/";
+	  gapi.client.load("muzziqapi","v1",function(){
+		  console.log("gapi is loaded!");
+	  },rootApi);
+  };
 }]);
 
 
 
-app.controller('menuCtrl',['$scope','$localStorage','$route',function($scope,$localStorage,$route){
+app.controller('menuCtrl',['$scope','$location','$route',function($scope,$location,$route){
   this.$route = $route;
   this.player = player;
   this.test = 'aplicatia merge bine!';
   console.log('functioneaza!');
+  this.genre = "Rock";
   this.play = function(){
-    $localStorage.player = this.player;
+    //$localStorage.player = this.player;
     console.log("play() invoked");
+    $location.path("/ongame");
   };
 }]);
 
-app.controller('gameCtrl',['$scope','$localStorage','$route',function($scope,$localStorage,$route){
+
+
+app.controller('gameCtrl',['$scope','$route',function($scope,$route){
   this.$route = $route;
-  console.log($localStorage.player);
-  this.player = $localStorage.player;
+  console.log("game controller");
+  this.player = player;
+  console.log(this.player);
   this.ind = 0;
-  //this.quizz = $scope.getQuizz();
+  
+  $scope.getQuizz("Rock");
+  
 }]);
 
 var player={
