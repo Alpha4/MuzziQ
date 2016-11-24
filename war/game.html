@@ -1,7 +1,12 @@
 <div>
-    <!--<h1>Game started!</h1>
-    <div>Welcome player {{gcontrol.player.name}}. Your score is {{gcontrol.player.score}}</div>-->
     <h1>Question {{gcontrol.ind}}</h1>
-    <div></div>
-
+    <div>{{gcontrol.question}}</div>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[0]}}<br>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[1]}}<br>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[2]}}<br>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[3]}}
+    
+    <br>
+    
+    <button ng-click="gcontrol.onclick()">Next Question</button><br>
 </div>

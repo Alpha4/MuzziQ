@@ -2,7 +2,11 @@
     <h1>MuzziQ</h1>
     <form name='myform' ng-submit='cont.play()'>
       Please enter your name: <input type="text" ng-model='cont.player.name' name='name'></input>
-      <div>{{player.name}}</div>
+      <div>{{cont.player.name}}</div>
+      <div ng-repeat="genre in cont.genres">
+      	<input type="radio" name="genres" ng-model="cont.player.quizzGenre" value="{{genre}}" >{{genre}}<br>
+      </div>
+      <div>{{cont.player.quizzGenre}}</div>
       <input type="submit" value="Play"></input>
     </form>
 </div>
