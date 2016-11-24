@@ -69,7 +69,7 @@ app.controller('menuCtrl',['$scope','$location','$route',function($scope,$locati
 
 
 //controlleur pour le deroulement du quizz liée à /onquizz
-app.controller('gameCtrl',['$scope','$route','$timeout',function($scope,$route,$timeout){
+app.controller('gameCtrl',['$scope','$route',function($scope,$route){
   this.$route = $route;
   this.player = player;
   console.log(this.player);
