@@ -10,6 +10,11 @@ var app = angular.module('app',['ngRoute']).config(['$routeProvider','$locationP
           templateUrl: 'game.html',
           controller: 'gameCtrl',
           controllerAs: 'gcontrol'
+        })
+        .when('/login',{
+        	templateUrl: 'login.html',
+        	controller: 'loginCtrl',
+        	controllerAs: 'lctrl'
         });
 }]);
 
@@ -25,7 +30,8 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   //à l'acces au site(ex : muzziq.appspot.com ), angular va appeler la premiere vue( celle qui a menuCtrl comme controlleur)
   console.log($location.url());
   if($location.url() == ""){
-	  $location.path("/main");
+	  console.log("change of ng-view");
+	  $location.path("/login");
   }
   this.$route = $route;
   
@@ -43,6 +49,17 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 	  });
   };
   
+  $scope.signOut = function(){
+	  $scope.auth2.signOut().then(function(){
+		  console.log("User signed out");
+		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
+		  $location.path("/login");
+		  $scope.$apply();
+	  });
+  }
+  
+  $scope.auth2=null;
+  
   //initialisation de gapi
   window.init = function(){
 	  console.log("calling window.init()")
@@ -50,7 +67,58 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 	  gapi.client.load("muzziqapi","v1",function(){
 		  console.log("gapi is loaded!");
 	  },rootApi);
+	  gapi.load('auth2',function(){
+		  console.log("in auth2 init()");
+		  $scope.auth2 = gapi.auth2.init({
+			  client_id: '438848968666-sjsva6m8hfus0uvmqqb2iuk8lk9uq3gc.apps.googleusercontent.com',
+			  scope: 'profile'
+		  });
+		  $scope.$apply();
+	  });
   };
+}]);
+
+
+app.controller('loginCtrl',['$scope','$location','$route',function($scope,$location,$route){
+	this.$route=$route;
+	var me = this;
+	$scope.$watch('auth2',function(newVal,oldVal){
+		if(newVal !== oldVal){
+			console.log("inside $watch method");
+			$scope.auth2.then(function(){
+				me.render();
+			});
+		}
+	});
+	
+	this.handleSuccess = function(googleUser){
+		console.log("loged in as"+ googleUser.getBasicProfile().getName());
+		console.log($scope.auth2.isSignedIn.get());
+		$location.path("/main");
+		$scope.$apply();
+	}
+	
+	this.handleFailure = function(){
+		console.log("handleFailure()");
+	}
+	
+	this.render = function(){
+		gapi.signin2.render('my-signin',{
+			'scope': 'email',
+			'width': 200,
+			'height': 50,
+			'longtitle': true,
+			'theme': 'dark',
+			'onsuccess': me.handleSuccess,
+			'onfailure': me.handleFailure
+		});
+	}
+	
+	if($scope.auth2 != null){
+		this.render();
+	}
+	
+	
 }]);
 
 
@@ -74,6 +142,7 @@ app.controller('gameCtrl',['$scope','$route',function($scope,$route){
   this.player = player;
   console.log(this.player);
   this.ind = $scope.ind;
+  this.signOut = $scope.signOut;
   
   
   //fonction qui modifie le modele en passant à la question suivante
