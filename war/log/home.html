@@ -1,0 +1,40 @@
+<!doctype html>
+<html ng-app="appMuzziQ" ng-controller="MainController">
+    <head>
+        <title>MuzziQ</title>
+
+        <script src="../assets/angular.min.js"></script>
+        <script src="../assets/angular-google-gapi.min.js"></script>
+        <script src="../assets/angular-cookies.min.js"></script>
+        <script src="home.js"></script>
+    </head>
+    <body>
+        <h1>MuzziQ</h1>
+        
+        <h3 ng-show="!user"> Vous n'êtes pas loger. Pour jouer veuillez vous log!</h3>
+        <br/>
+        <br/>
+
+        <button ng-click="login()" ng-show="!user">Sign In</button>
+        <button ng-click="logout()" ng-show="user">Sign Out</button>
+
+        <br/>
+        <br/>
+
+        <div ng-show="user">
+            <p>Hi {{user.name}}! Vous pouvez commencer à jouer.</p>
+            <img ng-src="{{user.picture}}" style="width:100px;">
+            
+            <a href="../jeu/game.html">
+                Jouer! 
+            </a>
+        </div>
+        
+        <br/>
+        <br/>
+        <a href="../index.html">
+					back
+		</a>
+
+    </body>
+</html>
