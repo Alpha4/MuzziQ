@@ -95,7 +95,6 @@ public class MuzziQAPI {
 			logger.log(Level.INFO, "add()");
 			elist.add(e);
 		}
-		
 		return elist;
 	}
 	
