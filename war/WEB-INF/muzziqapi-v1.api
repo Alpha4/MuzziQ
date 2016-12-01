@@ -27,7 +27,7 @@
   },
   "methods" : {
     "muzziqapi.getQuizz" : {
-      "path" : "quizz/{Genre}",
+      "path" : "quizz",
       "httpMethod" : "GET",
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
@@ -35,8 +35,27 @@
       "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
       "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
       "request" : {
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
+    "muzziqapi.verifyAnswer" : {
+      "path" : "verifyAnswer/{id}/{answer}",
+      "httpMethod" : "POST",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "292824132082.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.verifyAnswer",
+      "request" : {
         "parameters" : {
-          "Genre" : {
+          "id" : {
+            "type" : "int32",
+            "required" : true
+          },
+          "answer" : {
             "type" : "string",
             "required" : true
           }
@@ -62,9 +81,6 @@
             "items" : {
               "$ref" : "Question"
             }
-          },
-          "genre" : {
-            "type" : "string"
           }
         }
       },
@@ -85,12 +101,26 @@
             }
           }
         }
+      },
+      "CorrectAnswer" : {
+        "id" : "CorrectAnswer",
+        "type" : "object",
+        "properties" : {
+          "correct" : {
+            "type" : "boolean"
+          }
+        }
       }
     },
     "methods" : {
       "com.muzziq.api.MuzziQAPI.getQuizz" : {
         "response" : {
           "$ref" : "Quizz"
+        }
+      },
+      "com.muzziq.api.MuzziQAPI.verifyAnswer" : {
+        "response" : {
+          "$ref" : "CorrectAnswer"
         }
       }
     }
