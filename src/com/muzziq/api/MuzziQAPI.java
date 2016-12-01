@@ -3,6 +3,7 @@ package com.muzziq.api;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,9 +12,14 @@ import java.util.logging.Logger;
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
 import com.google.api.server.spi.config.Named;
+import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.FetchOptions;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.Filter;
@@ -23,6 +29,7 @@ import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.Stats;
 import com.muzziq.utils.Quizz;
+import com.muzziq.utils.CorrectAnswer;
 import com.muzziq.utils.QTemplate;
 import com.muzziq.utils.Question;
 
@@ -34,7 +41,9 @@ public class MuzziQAPI {
 	private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private Logger logger = Logger.getLogger("myLogger");
 	private MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-	private List<String> keys = new ArrayList<String>();
+	
+	//TODO a modifier avec le nombre exact
+	private final int nrElemInDS=15; 
 	
 	/***
 	 * Dans le constructeur de cette classe on peut rajouter les templates de questions
@@ -43,11 +52,7 @@ public class MuzziQAPI {
 	 * Pour rajouter des questions rajouter une QTemplate supplementaire!!
 	 * infoProvided et infoDemanded doivent etre des noms de propriétés dans la datastore
 	 * comme Artist, Année, Single, Album, Nationalité
-	 * 
-	 * Les questions avec plusieurs variables ne marchent pas encore
-	 * 
-	 * 
-	 * IL FAUT RAJOUTER les genres des singles presentes dans le datastore dans la liste keys!!! 
+	 *  
 	 */
 	
 	public MuzziQAPI(){
@@ -59,48 +64,67 @@ public class MuzziQAPI {
 		this.templates.add(new QTemplate("Artist","Album", "Lequel de ces albums est publié par %%var%%?"));
 		this.templates.add(new QTemplate("Artist","Nationalité","De quelle nationalité est l'artist %%var%%?"));
 		this.templates.add(new QTemplate("Nationalité","Artist","Lequel de ces artists est de nationalité %%var%%?"));
-		this.keys.add("Rock");
-		this.keys.add("Instrumental");
+		this.templates.add(new QTemplate("Genre","Single","Lequel de ces singles fait partie du genre %%var%%?"));
 	}
 	
 	
-	private boolean isMemcacheValid(String genre){
-		List<Entity> list = (List<Entity>) syncCache.get(genre);
-		if(list == null){
+	/**
+	 * memcache necessaire pour stocquer les clés du datastore
+	 * si il est vide il y a une selectkeys() retourne que les cles du datastore
+	 * @return true si le memcache est valide; false sinon
+	 */
+	private boolean isMemcacheValid(){
+		int  size = (int) this.syncCache.getStatistics().getItemCount();
+		if(size != nrElemInDS){
 			return false;
 		}else{
 			return true;
 		}
 	}
 	
-	private void putEntitiesInCache(List<Entity> genreList){
-		String key = (String) genreList.get(0).getProperty("Genre");
-		for(int i=0;i<genreList.size();i++){
-			List<Entity> e = (List<Entity>) syncCache.get(key);
+	
+	/**
+	 * function qui copie les cles dans le memcache si elles ne le sont pas dedans
+	 * @param keys
+	 */
+	private void putKeysInCache(List<Key> keys){
+		for(int i=0;i<keys.size();i++){
+			Key e = (Key) syncCache.get(i);
 			if(e == null){
-				syncCache.put(key, genreList);
+				syncCache.put(i, keys.get(i));
 			}
 		}
 	}
 	
-	private List<Entity> selectEntitiesByGenre(String genre){
-		Filter filterGenre = new FilterPredicate("Genre", FilterOperator.EQUAL, genre);
-		Query q = new Query("Qvars").setFilter(filterGenre);
-		PreparedQuery pq = this.datastore.prepare(q);
+	/**
+	 * requete le datastore pour en récuperer les clés
+	 * @return une liste des clés présentes dans le datastore
+	 */
+	private List<Key> selectKeys(){
+		Query q = new Query("Qvars");
+		PreparedQuery pq = this.datastore.prepare(q.setKeysOnly());
 		Iterable<Entity> itEntity = pq.asIterable();
 		Iterator<Entity> it = itEntity.iterator();
-		List<Entity> elist = new ArrayList<Entity>();
+		List<Key> keylist = new ArrayList<Key>();
 		while(it.hasNext()){
 			Entity e = it.next();
-			logger.log(Level.INFO, "add()");
-			elist.add(e);
+			Key key = e.getKey();
+			logger.log(Level.INFO, "adding key");
+			keylist.add(key);
 		}
-		return elist;
+		return keylist;
 	}
 	
-	private void createQuestion2(QTemplate template,String genre){
+	
+	/**
+	 * methode qui construit une question à partir d'un template et la rajoute à la liste des
+	 * questions
+	 * @param template
+	 * @throws EntityNotFoundException
+	 */
+	private void createQuestion(QTemplate template) throws EntityNotFoundException{
 		List<Integer> ids = new ArrayList<Integer>(); //id dans datastore
-		List<Integer> localids = new ArrayList<Integer>();//id dans memcache
+		List<Integer> memids = new ArrayList<Integer>();//id dans memcache
 		List<String> answers = new ArrayList<String>();
 		List<String> vars = new ArrayList<String>();
 		
@@ -110,41 +134,40 @@ public class MuzziQAPI {
 		
 		int size = (int) syncCache.getStatistics().getItemCount();
 		logger.log(Level.INFO,"memcache.size() = " + size);
+		int id = r.nextInt(size-1)+1;
 		
-		List<Entity> list = (List<Entity>) this.syncCache.get(genre);
-		int id = r.nextInt(list.size());
-		Entity correctEntity = list.get(id);
+		Key key = (Key) this.syncCache.get(id);
 		
-		String var = (String) correctEntity.getProperty(varContext);
+		Entity goodEntity = this.datastore.get(key);
+		
+		String var = (String) goodEntity.getProperty(varContext);
 		logger.log(Level.INFO, "var =  "+ var);
 		
-		String answer = (String) correctEntity.getProperty(answerContext);
+		String answer = (String) goodEntity.getProperty(answerContext);
 		logger.log(Level.INFO,"answer = "+ answer);
-		
-		int correctId = (int) correctEntity.getKey().getId();
-		logger.log(Level.INFO,"id = "+ correctId);
-		
-		ids.add(correctId);
-		localids.add(id);
+		int goodId = (int) key.getId();
+		ids.add(goodId);
+		memids.add(id);
 		vars.add(var);
 		answers.add(answer);
 		
 		int i = 0;
 		while(i<3){
-			int bid = r.nextInt(list.size());
-			if(localids.contains(bid)){
+			int bid = r.nextInt(size-1)+1;
+			if(memids.contains(bid)){
 				continue;
 			}else{
-				Entity bentity = list.get(bid);
-				String banswer = (String) bentity.getProperty(answerContext);
-				if(answers.contains(banswer)){
+				Key badKey = (Key) this.syncCache.get(bid);
+				Entity badEntity = this.datastore.get(badKey);
+				String badAnswer = (String) badEntity.getProperty(answerContext);
+				if(answers.contains(badAnswer)){
 					continue;
 				}else{
-					int badid = (int) bentity.getKey().getId();
+					int badId = (int) badKey.getId();
 					
-					ids.add(badid);
-					localids.add(bid);
-					answers.add(banswer);
+					ids.add(badId);
+					memids.add(bid);
+					answers.add(badAnswer);
 					
 					i++;
 				}
@@ -157,6 +180,8 @@ public class MuzziQAPI {
 	}
 	
 	
+	
+	
 	/**
 	 * Methode de l'api qui va être executé à chaque requete GET sur l'URL de l'API /quizz  
 	 * Elle retourne par le reseau un fichier json contenant le quizz
@@ -164,12 +189,12 @@ public class MuzziQAPI {
 	 */
 	
 	@ApiMethod(name="getQuizz")
-	public Quizz getQuizz(@Named("Genre") String genre){
-		Quizz myQuizz = new Quizz(1,genre);
+	public Quizz getQuizz(){ //@Named("Genre") String genre
+		Quizz myQuizz = new Quizz(1);
 		logger.log(Level.INFO, "checking the memcache ...");
-		if(!this.isMemcacheValid(myQuizz.getGenre())){
+		if(!this.isMemcacheValid()){
 			logger.log(Level.INFO, "memcache not valid; querying datastore");
-			this.putEntitiesInCache(this.selectEntitiesByGenre(myQuizz.getGenre()));
+			this.putKeysInCache(this.selectKeys());
 		}else{
 			logger.log(Level.INFO, "memcache valid; nothing to do ...");
 		}
@@ -177,10 +202,22 @@ public class MuzziQAPI {
 		this.questions.clear();
 		
 		for(int i=0;i<this.templates.size();i++){
-			this.createQuestion2(this.templates.get(i),myQuizz.getGenre());
+			try {
+				this.createQuestion(this.templates.get(i));
+			} catch (EntityNotFoundException e) {
+				// TODO Auto-generated catch block
+				logger.log(Level.INFO, "entity could not be found in ds");
+			}
+			logger.log(Level.INFO, "before adding question "+i+ " to quizz");
 			myQuizz.addQuestion(this.questions.get(i));
 		}
 		return myQuizz;
 		
 	}
+	
+	@ApiMethod(name="verifyAnswer")
+	public CorrectAnswer verifyAnswer(@Named("id") int id, @Named("answer") String answer){
+		return new CorrectAnswer(true);
+	}
+	
 }
