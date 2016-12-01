@@ -28,12 +28,16 @@ import com.google.appengine.api.datastore.Query.FilterPredicate;
 import com.google.appengine.api.memcache.MemcacheService;
 import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.Stats;
+import com.google.appengine.api.oauth.OAuthRequestException;
+import com.google.appengine.api.users.User;
 import com.muzziq.utils.Quizz;
 import com.muzziq.utils.CorrectAnswer;
 import com.muzziq.utils.QTemplate;
 import com.muzziq.utils.Question;
 
-@Api(name="muzziqapi",version="v1", description="An API to manage music quizzes")
+
+//TODO a modifier clientIds
+@Api(name="muzziqapi",version="v1", description="An API to manage music quizzes",clientIds={"438848968666-sjsva6m8hfus0uvmqqb2iuk8lk9uq3gc.apps.googleusercontent.com"})
 public class MuzziQAPI {
 	
 	private List<QTemplate> templates = new ArrayList<QTemplate>();
@@ -186,38 +190,48 @@ public class MuzziQAPI {
 	 * Methode de l'api qui va être executé à chaque requete GET sur l'URL de l'API /quizz  
 	 * Elle retourne par le reseau un fichier json contenant le quizz
 	 * @return Quizz myQuizz
+	 * @throws OAuthRequestException 
 	 */
 	
 	@ApiMethod(name="getQuizz")
-	public Quizz getQuizz(){ //@Named("Genre") String genre
-		Quizz myQuizz = new Quizz(1);
-		logger.log(Level.INFO, "checking the memcache ...");
-		if(!this.isMemcacheValid()){
-			logger.log(Level.INFO, "memcache not valid; querying datastore");
-			this.putKeysInCache(this.selectKeys());
-		}else{
-			logger.log(Level.INFO, "memcache valid; nothing to do ...");
-		}
-		
-		this.questions.clear();
-		
-		for(int i=0;i<this.templates.size();i++){
-			try {
-				this.createQuestion(this.templates.get(i));
-			} catch (EntityNotFoundException e) {
-				// TODO Auto-generated catch block
-				logger.log(Level.INFO, "entity could not be found in ds");
+	public Quizz getQuizz(User user) throws OAuthRequestException{ 
+		if(user != null){
+			Quizz myQuizz = new Quizz(1);
+			logger.log(Level.INFO, "checking the memcache ...");
+			if(!this.isMemcacheValid()){
+				logger.log(Level.INFO, "memcache not valid; querying datastore");
+				this.putKeysInCache(this.selectKeys());
+			}else{
+				logger.log(Level.INFO, "memcache valid; nothing to do ...");
 			}
-			logger.log(Level.INFO, "before adding question "+i+ " to quizz");
-			myQuizz.addQuestion(this.questions.get(i));
+			
+			this.questions.clear();
+			
+			for(int i=0;i<this.templates.size();i++){
+				try {
+					this.createQuestion(this.templates.get(i));
+				} catch (EntityNotFoundException e) {
+					// TODO Auto-generated catch block
+					logger.log(Level.INFO, "entity could not be found in ds");
+				}
+				logger.log(Level.INFO, "before adding question "+i+ " to quizz");
+				myQuizz.addQuestion(this.questions.get(i));
+			}
+			return myQuizz;
+		}else{
+			throw new OAuthRequestException("user should be not null");
 		}
-		return myQuizz;
+		
 		
 	}
 	
 	@ApiMethod(name="verifyAnswer")
-	public CorrectAnswer verifyAnswer(@Named("id") int id, @Named("answer") String answer){
-		return new CorrectAnswer(true);
+	public CorrectAnswer verifyAnswer(@Named("id") int id, @Named("answer") String answer, User user) throws OAuthRequestException{
+		if(user != null){
+			return new CorrectAnswer(true);
+		}else{
+			throw new OAuthRequestException("user should be not null");
+		}
 	}
 	
 }

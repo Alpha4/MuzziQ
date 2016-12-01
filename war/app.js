@@ -240,7 +240,6 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
   //appel à la methode du api qui retourne le quizz
   $scope.getQuizz();
   
-  //verification que le quizz est bien retourné avant de l'aficher
   //laisser "me" car si on utilise this dans $scope.$watch(...) ceci ne correspond pas au controlleur 
   
   $scope.$watch("questions",function(newVal,oldVal){
