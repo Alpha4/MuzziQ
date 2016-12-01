@@ -31,18 +31,20 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   console.log($location.url());
   if($location.url() == ""){
 	  console.log("change of ng-view");
-	  $location.path("/login");
+	  $location.path("/main");
   }
   this.$route = $route;
   
   //definition des variables pouvant etre appellés dans les nested controllers(menuCtrl,gameCtrl)
   $scope.questions = null;
   $scope.ind = 0;
+  $scope.isSignedIn = null;
+  $scope.isCurrentAnswerCorrect = null;
   
   //fonction appelant gapi.client.muzziqapi pour demander le quizz
-  $scope.getQuizz = function(genre){
+  $scope.getQuizz = function(){
 	  console.log("getquizz method");
-	  var req = gapi.client.muzziqapi.getQuizz({"Genre" : genre}).execute(function(response){
+	  var req = gapi.client.muzziqapi.getQuizz().execute(function(response){
 		  $scope.questions = response.questions;
 		  console.log("created scope.questions");
 		  $scope.$apply();
@@ -53,9 +55,20 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 	  $scope.auth2.signOut().then(function(){
 		  console.log("User signed out");
 		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
-		  $location.path("/login");
+		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
+		  $location.path("/main");
 		  $scope.$apply();
 	  });
+  }
+  
+  $scope.verifyAnswer = function(id,answer){
+	  console.log("inside verifyAnswer method");
+	  $scope.isCurrentAnswerCorrect = null;
+	  var req = gapi.client.muzziqapi.verifyAnswer({"id":id,"answer":answer}).execute(function(response){
+		  console.log("is correct ? :"+response.correct);
+		  $scope.isCurrentAnswerCorrect = response.correct;//true or false
+		  $scope.$apply();
+	  })
   }
   
   $scope.auth2=null;
@@ -93,7 +106,9 @@ app.controller('loginCtrl',['$scope','$location','$route',function($scope,$locat
 	
 	this.handleSuccess = function(googleUser){
 		console.log("loged in as"+ googleUser.getBasicProfile().getName());
+		//$scope.user = googleUser.getBasicProfile().getName();
 		console.log($scope.auth2.isSignedIn.get());
+		$scope.isSignedIn = $scope.auth2.isSignedIn.get();
 		$location.path("/main");
 		$scope.$apply();
 	}
@@ -126,44 +141,108 @@ app.controller('loginCtrl',['$scope','$location','$route',function($scope,$locat
 app.controller('menuCtrl',['$scope','$location','$route',function($scope,$location,$route){
   this.$route = $route;
   this.player = player;
-  this.genres = genres;
-  console.log(this.genres)
+  this.signOut = $scope.signOut;
+  var me = this;
+  $scope.$watch('auth2',function(newVal,oldVal){
+	  if(newVal !== oldVal){
+		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
+		  me.isSignedIn = $scope.isSignedIn;
+		  if($scope.isSignedIn === true){
+			  me.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
+			  me.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
+			  me.text = "Play Game";
+		  }else if($scope.isSignedIn === false){
+			  me.text = "Log in";
+		  }
+	  }
+  });
+  
+  if($scope.auth2 !== null){
+	  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
+	  this.isSignedIn = $scope.isSignedIn;
+	  if($scope.isSignedIn === true){
+		  this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
+		  this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
+		  this.text = "Play Game";
+	  }else if($scope.isSignedIn === false){
+		  this.text = "Log in";
+	  }
+  }
+  
+  
+  
   this.play = function(){
     console.log("play() invoked");
-    $location.path("/ongame");
+    if($scope.isSignedIn === true){
+    	$location.path("/ongame");
+    }else if($scope.isSignedIn === false){
+    	$location.path("/login");
+    }
   };
 }]);
 
 
 
 //controlleur pour le deroulement du quizz liée à /onquizz
-app.controller('gameCtrl',['$scope','$route',function($scope,$route){
+app.controller('gameCtrl',['$location','$scope','$route',function($location,$scope,$route){
   this.$route = $route;
   this.player = player;
   console.log(this.player);
   this.ind = $scope.ind;
   this.signOut = $scope.signOut;
-  
+  this.chosenAnswer = null;
+  this.hideValidate = false;
   
   //fonction qui modifie le modele en passant à la question suivante
-  //TODO a finir 
   this.onclick = function(){
 	  if(this.ind < $scope.questions.length - 1){
 		  console.log("inside onclick() method");
+		  //$scope.isCurrentAnswerCorrect = null;
+		  console.log("correct = "+$scope.isCurrentAnswerCorrect);
+		  this.hideValidate = false;
+		  console.log("hide: "+this.hideValidate);
 		  this.ind++;
 		  this.question = $scope.questions[this.ind].content;
 		  this.answers= $scope.questions[this.ind].answers;
+		  this.questId = $scope.questions[this.ind].id;
+		  console.log("id = "+this.questId);
 		  console.log(this.question);
 		  console.log(this.ind);
 	  }
   }
   
+  //fonction qui verifie si la reponse est correcte
+  //TODO nu uita sa modifici variabilele la delogare
+  this.onclickValidate = function(){
+	  console.log("inside onclickValidate method");
+	  $scope.verifyAnswer(this.questId,this.chosenAnswer);
+	 
+  }
+  
+  var me = this;
+  $scope.$watch("isCurrentAnswerCorrect",function(newVal,oldVal){
+	  console.log("newVal = "+newVal+" ; oldVal = "+oldVal);
+	  if((newVal === true || newVal === false) && oldVal===null){
+		  console.log($scope.isCurrentAnswerCorrect);
+		  if($scope.isCurrentAnswerCorrect === true){
+			  me.player.score += 1;
+		  }
+		  me.hideValidate = true;
+		  console.log("hide1 : "+me.hideValidate);
+	  }
+  });
+  
+  if(this.player.name === ''){
+	  $location.path("/main");
+  }
+  
+  
   //appel à la methode du api qui retourne le quizz
-  $scope.getQuizz(this.player.quizzGenre);
+  $scope.getQuizz();
   
   //verification que le quizz est bien retourné avant de l'aficher
   //laisser "me" car si on utilise this dans $scope.$watch(...) ceci ne correspond pas au controlleur 
-  var me = this;
+  
   $scope.$watch("questions",function(newVal,oldVal){
 	  if(newVal !== oldVal){
 		  console.log("newVal = "+newVal);
@@ -173,6 +252,7 @@ app.controller('gameCtrl',['$scope','$route',function($scope,$route){
 		  console.log("me version");
 		  me.question = $scope.questions[me.ind].content;
 		  me.answers = $scope.questions[me.ind].answers;
+		  me.questId = $scope.questions[me.ind].id;
 	  }
   });
   
@@ -181,8 +261,6 @@ app.controller('gameCtrl',['$scope','$route',function($scope,$route){
 var player={
   name:'',
   score:0,
-  quizzGenre:''
+  imageUrl:''
 };
 
-//TODO ajouter les autres genres 
-var genres = ["Rock","Instrumental"];

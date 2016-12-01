@@ -1,12 +1,16 @@
 <div>
 	<button ng-click="gcontrol.signOut();">Sign out</button>
     <h1>Question {{gcontrol.ind}}</h1>
-    <div>{{gcontrol.question}}</div>
-    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[0]}}<br>
-    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[1]}}<br>
-    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[2]}}<br>
-    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" >{{gcontrol.answers[3]}}
+    <div>{{gcontrol.question}} + {{gcontrol.questId}}</div>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" value="{{gcontrol.answers[0]}}">{{gcontrol.answers[0]}}<br>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" value="{{gcontrol.answers[1]}}">{{gcontrol.answers[1]}}<br>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" value="{{gcontrol.answers[2]}}">{{gcontrol.answers[2]}}<br>
+    <input type="radio" name="answers" ng-model="gcontrol.chosenAnswer" value="{{gcontrol.answers[3]}}">{{gcontrol.answers[3]}}
     
     <br>
-    <button ng-click="gcontrol.onclick()">Next Question</button><br>
+    <button ng-hide="gcontrol.hideValidate" ng-click="gcontrol.onclickValidate()">Validate Question</button>
+    <button ng-show="gcontrol.hideValidate" ng-click="gcontrol.onclick()">Next Question</button><br>
+    <div>SCORE : {{gcontrol.player.score}} </div>
+    
+    <div>This is the chosen answer : {{gcontrol.chosenAnswer}}</div>
 </div>
