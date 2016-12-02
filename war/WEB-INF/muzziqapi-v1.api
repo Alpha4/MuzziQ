@@ -1,14 +1,14 @@
 {
   "extends" : "thirdParty.api",
   "abstract" : false,
-  "root" : "https://coral-147014.appspot.com/_ah/api",
+  "root" : "https://muzziq-148913.appspot.com/_ah/api",
   "name" : "muzziqapi",
   "version" : "v1",
   "description" : "An API to manage music quizzes",
   "defaultVersion" : false,
   "discovery" : [ "PUBLIC" ],
   "adapter" : {
-    "bns" : "https://coral-147014.appspot.com/_ah/spi",
+    "bns" : "https://muzziq-148913.appspot.com/_ah/spi",
     "deadline" : 65.0,
     "type" : "lily"
   },
@@ -32,7 +32,7 @@
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
-      "clientIds" : [ "438848968666-sjsva6m8hfus0uvmqqb2iuk8lk9uq3gc.apps.googleusercontent.com" ],
+      "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
       "rosyMethod" : "com.muzziq.api.MuzziQAPI.verifyAnswer",
       "request" : {
         "parameters" : {
@@ -57,7 +57,7 @@
       "authLevel" : "NONE",
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
-      "clientIds" : [ "438848968666-sjsva6m8hfus0uvmqqb2iuk8lk9uq3gc.apps.googleusercontent.com" ],
+      "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
       "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
       "request" : {
         "body" : "empty"

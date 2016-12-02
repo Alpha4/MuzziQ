@@ -37,7 +37,7 @@ import com.muzziq.utils.Question;
 
 
 //TODO a modifier clientIds
-@Api(name="muzziqapi",version="v1", description="An API to manage music quizzes",clientIds={"438848968666-sjsva6m8hfus0uvmqqb2iuk8lk9uq3gc.apps.googleusercontent.com"})
+@Api(name="muzziqapi",version="v1", description="An API to manage music quizzes",clientIds={"230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com"})
 public class MuzziQAPI {
 	
 	private List<QTemplate> templates = new ArrayList<QTemplate>();

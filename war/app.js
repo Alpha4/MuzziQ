@@ -56,6 +56,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 		  console.log("User signed out");
 		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
 		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
+		  player.score = 0;
 		  $location.path("/main");
 		  $scope.$apply();
 	  });
@@ -76,14 +77,14 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   //initialisation de gapi
   window.init = function(){
 	  console.log("calling window.init()")
-	  var rootApi = "https://coral-147014.appspot.com/_ah/api/";
+	  var rootApi = "https://muzziq-148913.appspot.com/_ah/api/";
 	  gapi.client.load("muzziqapi","v1",function(){
 		  console.log("gapi is loaded!");
 	  },rootApi);
 	  gapi.load('auth2',function(){
 		  console.log("in auth2 init()");
 		  $scope.auth2 = gapi.auth2.init({
-			  client_id: '438848968666-sjsva6m8hfus0uvmqqb2iuk8lk9uq3gc.apps.googleusercontent.com',
+			  client_id: '230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com',
 			  scope: 'profile'
 		  });
 		  $scope.$apply();
