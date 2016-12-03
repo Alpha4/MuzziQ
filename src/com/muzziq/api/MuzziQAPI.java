@@ -66,9 +66,8 @@ public class MuzziQAPI {
 		this.templates.add(new QTemplate("Année", "Album", "Quel album est apparu en %%var%%?"));
 		this.templates.add(new QTemplate("Artist","Single", "Lequel de ces singles est publié par %%var%%"));
 		this.templates.add(new QTemplate("Artist","Album", "Lequel de ces albums est publié par %%var%%?"));
-		this.templates.add(new QTemplate("Artist","Nationalité","De quelle nationalité est l'artist %%var%%?"));
-		this.templates.add(new QTemplate("Nationalité","Artist","Lequel de ces artists est de nationalité %%var%%?"));
 		this.templates.add(new QTemplate("Genre","Single","Lequel de ces singles fait partie du genre %%var%%?"));
+		this.templates.add(new QTemplate("Single","Genre","De quel genre est le single %%var%%?"));
 	}
 	
 	

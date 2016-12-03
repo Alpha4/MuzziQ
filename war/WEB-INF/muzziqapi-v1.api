@@ -26,6 +26,21 @@
     "maxAge" : 0
   },
   "methods" : {
+    "muzziqapi.getQuizz" : {
+      "path" : "quizz",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
+      "request" : {
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
+    },
     "muzziqapi.verifyAnswer" : {
       "path" : "verifyAnswer/{id}/{answer}",
       "httpMethod" : "POST",
@@ -50,34 +65,10 @@
       "response" : {
         "body" : "autoTemplate(backendResponse)"
       }
-    },
-    "muzziqapi.getQuizz" : {
-      "path" : "quizz",
-      "httpMethod" : "GET",
-      "authLevel" : "NONE",
-      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
-      "audiences" : [ ],
-      "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
-      "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
-      "request" : {
-        "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
     }
   },
   "descriptor" : {
     "schemas" : {
-      "CorrectAnswer" : {
-        "id" : "CorrectAnswer",
-        "type" : "object",
-        "properties" : {
-          "correct" : {
-            "type" : "boolean"
-          }
-        }
-      },
       "Quizz" : {
         "id" : "Quizz",
         "type" : "object",
@@ -110,17 +101,26 @@
             }
           }
         }
+      },
+      "CorrectAnswer" : {
+        "id" : "CorrectAnswer",
+        "type" : "object",
+        "properties" : {
+          "correct" : {
+            "type" : "boolean"
+          }
+        }
       }
     },
     "methods" : {
-      "com.muzziq.api.MuzziQAPI.verifyAnswer" : {
-        "response" : {
-          "$ref" : "CorrectAnswer"
-        }
-      },
       "com.muzziq.api.MuzziQAPI.getQuizz" : {
         "response" : {
           "$ref" : "Quizz"
+        }
+      },
+      "com.muzziq.api.MuzziQAPI.verifyAnswer" : {
+        "response" : {
+          "$ref" : "CorrectAnswer"
         }
       }
     }
