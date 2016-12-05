@@ -39,7 +39,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.Stats;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.muzziq.utils.Ligne;
+import com.muzziq.utils.ResDatastore;
 import com.muzziq.utils.Quizz;
 import com.muzziq.utils.CorrectAnswer;
 import com.muzziq.utils.QTemplate;
@@ -80,9 +80,9 @@ public class MuzziQAPI {
 	}
 	
 	@ApiMethod(name="fillDataStore",httpMethod = HttpMethod.GET)
-	public void fillDataStore(@Named("in")String in) throws IOException, JSONException
+	public ResDatastore fillDataStore(@Named("in")String in) throws IOException, JSONException
 	{
-		File fi = new File("war/WEB-INF/"+in);
+		File fi = new File("WEB-INF/"+in);
 
 		try 
 		{
@@ -98,6 +98,8 @@ public class MuzziQAPI {
 			br.readLine();
 			br.readLine();
 			
+			logger.log(Level.INFO,"inside try, before while() of fillDatastore");
+			
 			while ((line = br.readLine()) != null)
 			{
 				JSONObject obj = new JSONObject(line);
@@ -111,6 +113,7 @@ public class MuzziQAPI {
 					n = n.substring(0,ind)+n.substring(ind + 1, n.length());
 				}
 				
+				logger.log(Level.INFO, index + "th time in the while loop");
 				// Cas spécial
 				if (n.equals("Cotentin Aurélien"))
 				{
@@ -159,18 +162,25 @@ public class MuzziQAPI {
 					datastore.put(ent);
 									
 					index++;
+					
+					logger.log(Level.INFO, "put entity in datastore");
 				}
 				previousLine=obj;
 			}
+			logger.log(Level.INFO, "exited while()");
 			
 			br.close();
 			
 			nrElemInDS += index;
+			logger.log(Level.INFO, "there are "+ nrElemInDS + " in Datastore");
 		}
 		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
+			logger.log(Level.INFO, "inside FileNotFoundException");
 		}
+		
+		return new ResDatastore(true);
 	}
 	
 	
@@ -296,7 +306,7 @@ public class MuzziQAPI {
 	 * @throws OAuthRequestException 
 	 */
 	
-	@ApiMethod(name="getQuizz")
+	@ApiMethod(name="getQuizz",httpMethod = HttpMethod.GET)
 	public Quizz getQuizz(User user) throws OAuthRequestException{ 
 		if(user != null){
 			Quizz myQuizz = new Quizz(1);
