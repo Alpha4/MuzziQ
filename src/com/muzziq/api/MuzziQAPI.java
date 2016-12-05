@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
+import com.google.api.server.spi.config.ApiMethod.HttpMethod;
 import com.google.api.server.spi.config.Named;
 import com.google.appengine.api.datastore.Cursor;
 import com.google.appengine.api.datastore.DatastoreService;
@@ -45,7 +46,7 @@ import com.muzziq.utils.QTemplate;
 import com.muzziq.utils.Question;
 
 
-//TODO a modifier clientIds
+
 @SuppressWarnings("unused")
 @Api(name="muzziqapi",version="v1", description="An API to manage music quizzes",clientIds={"230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com"})
 public class MuzziQAPI {
@@ -55,9 +56,7 @@ public class MuzziQAPI {
 	private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private Logger logger = Logger.getLogger("myLogger");
 	private MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-	
-	//TODO a modifier avec le nombre exact
-	private final int nrElemInDS=15; 
+	private int nrElemInDS=0; 
 	
 	/***
 	 * Dans le constructeur de cette classe on peut rajouter les templates de questions
@@ -65,35 +64,35 @@ public class MuzziQAPI {
 	 * 
 	 * Pour rajouter des questions rajouter une QTemplate supplementaire!!
 	 * infoProvided et infoDemanded doivent etre des noms de propriétés dans la datastore
-	 * comme Artist, Année, Single, Album, Nationalité
+	 * comme Artist, Year, Single, Album, Nationalité
 	 *  
 	 */
 	
 	public MuzziQAPI(){
 		this.templates.add(new QTemplate("Single","Artist","Quel artist a composé le single %%var%%?"));
 		this.templates.add(new QTemplate("Album","Artist","Quel artist a composé l'album %%var%%?"));
-		this.templates.add(new QTemplate("Année","Single", "Quel single est apparu en %%var%%?"));
-		this.templates.add(new QTemplate("Année", "Album", "Quel album est apparu en %%var%%?"));
+		this.templates.add(new QTemplate("Year","Single", "Quel single est apparu en %%var%%?"));
+		this.templates.add(new QTemplate("Year", "Album", "Quel album est apparu en %%var%%?"));
 		this.templates.add(new QTemplate("Artist","Single", "Lequel de ces singles est publié par %%var%%"));
 		this.templates.add(new QTemplate("Artist","Album", "Lequel de ces albums est publié par %%var%%?"));
 		this.templates.add(new QTemplate("Genre","Single","Lequel de ces singles fait partie du genre %%var%%?"));
 		this.templates.add(new QTemplate("Single","Genre","De quel genre est le single %%var%%?"));
 	}
 	
-	/*
-	private void fillDataStore(String in) throws IOException, JSONException
+	@ApiMethod(name="fillDataStore",httpMethod = HttpMethod.GET)
+	public void fillDataStore(@Named("in")String in) throws IOException, JSONException
 	{
 		File fi = new File("war/WEB-INF/"+in);
-		
-		ArrayList<Ligne> res = new ArrayList<Ligne>();
-		boolean inserer = true;
 
 		try 
 		{
 			FileInputStream fis = new FileInputStream(fi);
 			
+			int index = 1;
+			
 			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 			String line;
+			JSONObject previousLine = null;
 			
 			// On saute les 2 premières lignes
 			br.readLine();
@@ -101,9 +100,8 @@ public class MuzziQAPI {
 			
 			while ((line = br.readLine()) != null)
 			{
-				inserer = true;
-				
 				JSONObject obj = new JSONObject(line);
+				
 				
 				String n = obj.getJSONObject("name").getString("value");
 				
@@ -146,33 +144,35 @@ public class MuzziQAPI {
 				}
 				String an = obj.getJSONObject("annee").getString("value").substring(0,4);
 				
+				//COMPARAISON PAS DE DOUBLONS
+				if (previousLine.getJSONObject("name").getString("value")!= n 
+					&& previousLine.getJSONObject("title").getString("value") != t
+					&& previousLine.getJSONObject("albumName").getString("value") != a) {
 				
-				if (res.size() > 0)
-				{
-					for (int i=0;i<res.size();i++)
-					{
-						if ((res.get(i).getName().equals(n)) && (res.get(i).getTitre().equals(t)))
-						{
-							inserer = false;
-						}
-					}
+					Entity ent = new Entity("Qvars",index);
+					ent.setProperty("Artist", n);
+					ent.setProperty("Title", t);
+					ent.setProperty("Album", a);
+					ent.setProperty("Genre", g);
+					ent.setProperty("Year", an);
+					
+					datastore.put(ent);
+									
+					index++;
 				}
-				
-				if (inserer)
-				{
-					Ligne l = new Ligne(n,t,a,g,an);
-					res.add(l); // TODO MODIFIER AVEC DATASTORE.PUT(utiliser les getters de Ligne pour les arguments)
-				}
+				previousLine=obj;
 			}
 			
 			br.close();
+			
+			nrElemInDS += index;
 		}
 		catch (FileNotFoundException e)
 		{
 			e.printStackTrace();
 		}
 	}
-	*/
+	
 	
 	
 	/**
@@ -324,8 +324,6 @@ public class MuzziQAPI {
 		}else{
 			throw new OAuthRequestException("user should be not null");
 		}
-		
-		
 	}
 	
 	@ApiMethod(name="verifyAnswer")
