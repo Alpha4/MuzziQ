@@ -1,5 +1,11 @@
 package com.muzziq.api;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +14,8 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.api.server.spi.config.Api;
 import com.google.api.server.spi.config.ApiMethod;
@@ -30,6 +38,7 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.Stats;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
+import com.muzziq.utils.Ligne;
 import com.muzziq.utils.Quizz;
 import com.muzziq.utils.CorrectAnswer;
 import com.muzziq.utils.QTemplate;
@@ -37,6 +46,7 @@ import com.muzziq.utils.Question;
 
 
 //TODO a modifier clientIds
+@SuppressWarnings("unused")
 @Api(name="muzziqapi",version="v1", description="An API to manage music quizzes",clientIds={"230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com"})
 public class MuzziQAPI {
 	
@@ -69,6 +79,100 @@ public class MuzziQAPI {
 		this.templates.add(new QTemplate("Genre","Single","Lequel de ces singles fait partie du genre %%var%%?"));
 		this.templates.add(new QTemplate("Single","Genre","De quel genre est le single %%var%%?"));
 	}
+	
+	/*
+	private void fillDataStore(String in) throws IOException, JSONException
+	{
+		File fi = new File("war/WEB-INF/"+in);
+		
+		ArrayList<Ligne> res = new ArrayList<Ligne>();
+		boolean inserer = true;
+
+		try 
+		{
+			FileInputStream fis = new FileInputStream(fi);
+			
+			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+			String line;
+			
+			// On saute les 2 premières lignes
+			br.readLine();
+			br.readLine();
+			
+			while ((line = br.readLine()) != null)
+			{
+				inserer = true;
+				
+				JSONObject obj = new JSONObject(line);
+				
+				String n = obj.getJSONObject("name").getString("value");
+				
+				int ind = n.indexOf(',');
+				if (ind > 0)
+				{
+					n = n.substring(0,ind)+n.substring(ind + 1, n.length());
+				}
+				
+				// Cas spécial
+				if (n.equals("Cotentin Aurélien"))
+				{
+					n = "Orelsan";
+				}
+					
+				String t = obj.getJSONObject("title").getString("value");
+				
+				ind = t.indexOf('(');
+				if (ind > 0)
+				{
+					int ind1 = t.indexOf(')');
+					t = t.substring(0,ind)+t.substring(ind1 + 1, t.length());
+				}
+				
+				String a = obj.getJSONObject("albumName").getString("value");
+				
+				ind = a.indexOf('(');
+				if (ind > 0)
+				{
+					int ind2 = a.indexOf(')');
+					a = a.substring(0,ind)+a.substring(ind2 + 1, a.length());
+				}
+				
+				String g = obj.getJSONObject("genre").getString("value");
+				
+				// Cas spécial
+				if (g.equals("Horrorcore"))
+				{
+					g = "Contemporary R&B";
+				}
+				String an = obj.getJSONObject("annee").getString("value").substring(0,4);
+				
+				
+				if (res.size() > 0)
+				{
+					for (int i=0;i<res.size();i++)
+					{
+						if ((res.get(i).getName().equals(n)) && (res.get(i).getTitre().equals(t)))
+						{
+							inserer = false;
+						}
+					}
+				}
+				
+				if (inserer)
+				{
+					Ligne l = new Ligne(n,t,a,g,an);
+					res.add(l); // TODO MODIFIER AVEC DATASTORE.PUT(utiliser les getters de Ligne pour les arguments)
+				}
+			}
+			
+			br.close();
+		}
+		catch (FileNotFoundException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	*/
 	
 	
 	/**
