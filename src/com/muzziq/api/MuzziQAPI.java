@@ -92,7 +92,9 @@ public class MuzziQAPI {
 			
 			BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 			String line;
-			JSONObject previousLine = null;
+			String previousTitle = "";
+			String previousArtist = "";
+			String previousAlbum = "";
 			
 			// On saute les 2 premières lignes
 			br.readLine();
@@ -147,10 +149,14 @@ public class MuzziQAPI {
 				}
 				String an = obj.getJSONObject("annee").getString("value").substring(0,4);
 				
-				//COMPARAISON PAS DE DOUBLONS
-				if (previousLine.getJSONObject("name").getString("value")!= n 
-					&& previousLine.getJSONObject("title").getString("value") != t
-					&& previousLine.getJSONObject("albumName").getString("value") != a) {
+				
+				/*COMPARAISON PAS DE DOUBLONS
+				 * Artiste ≠ on insère
+				 * Titre ≠ on insère
+				 * Album ≠ on insère (même single repris par l'artiste lui-même ?)
+				 */
+				if (!previousTitle.equals(t) 
+					|| !previousArtist.equals(n) || !previousAlbum.equals(a)) {
 				
 					Entity ent = new Entity("Qvars",index);
 					ent.setProperty("Artist", n);
@@ -165,7 +171,9 @@ public class MuzziQAPI {
 					
 					logger.log(Level.INFO, "put entity in datastore");
 				}
-				previousLine=obj;
+				previousArtist=n;
+				previousTitle=t;
+				previousAlbum=a;
 			}
 			logger.log(Level.INFO, "exited while()");
 			

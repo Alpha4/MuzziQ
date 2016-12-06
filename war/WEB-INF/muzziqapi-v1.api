@@ -26,27 +26,6 @@
     "maxAge" : 0
   },
   "methods" : {
-    "muzziqapi.fillDataStore" : {
-      "path" : "fillDataStore/{in}",
-      "httpMethod" : "GET",
-      "authLevel" : "NONE",
-      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
-      "audiences" : [ ],
-      "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
-      "rosyMethod" : "com.muzziq.api.MuzziQAPI.fillDataStore",
-      "request" : {
-        "parameters" : {
-          "in" : {
-            "type" : "string",
-            "required" : true
-          }
-        },
-        "body" : "empty"
-      },
-      "response" : {
-        "body" : "autoTemplate(backendResponse)"
-      }
-    },
     "muzziqapi.getQuizz" : {
       "path" : "quizz",
       "httpMethod" : "GET",
@@ -86,19 +65,31 @@
       "response" : {
         "body" : "autoTemplate(backendResponse)"
       }
+    },
+    "muzziqapi.fillDataStore" : {
+      "path" : "fillDataStore/{in}",
+      "httpMethod" : "GET",
+      "authLevel" : "NONE",
+      "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
+      "audiences" : [ ],
+      "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.fillDataStore",
+      "request" : {
+        "parameters" : {
+          "in" : {
+            "type" : "string",
+            "required" : true
+          }
+        },
+        "body" : "empty"
+      },
+      "response" : {
+        "body" : "autoTemplate(backendResponse)"
+      }
     }
   },
   "descriptor" : {
     "schemas" : {
-      "ResDatastore" : {
-        "id" : "ResDatastore",
-        "type" : "object",
-        "properties" : {
-          "ok" : {
-            "type" : "boolean"
-          }
-        }
-      },
       "Quizz" : {
         "id" : "Quizz",
         "type" : "object",
@@ -140,14 +131,18 @@
             "type" : "boolean"
           }
         }
+      },
+      "ResDatastore" : {
+        "id" : "ResDatastore",
+        "type" : "object",
+        "properties" : {
+          "ok" : {
+            "type" : "boolean"
+          }
+        }
       }
     },
     "methods" : {
-      "com.muzziq.api.MuzziQAPI.fillDataStore" : {
-        "response" : {
-          "$ref" : "ResDatastore"
-        }
-      },
       "com.muzziq.api.MuzziQAPI.getQuizz" : {
         "response" : {
           "$ref" : "Quizz"
@@ -156,6 +151,11 @@
       "com.muzziq.api.MuzziQAPI.verifyAnswer" : {
         "response" : {
           "$ref" : "CorrectAnswer"
+        }
+      },
+      "com.muzziq.api.MuzziQAPI.fillDataStore" : {
+        "response" : {
+          "$ref" : "ResDatastore"
         }
       }
     }
