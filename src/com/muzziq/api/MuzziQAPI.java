@@ -56,7 +56,7 @@ public class MuzziQAPI {
 	private DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
 	private Logger logger = Logger.getLogger("myLogger");
 	private MemcacheService syncCache = MemcacheServiceFactory.getMemcacheService();
-	private int nrElemInDS=0; 
+	private final int nrElemInDS=115; 
 	
 	/***
 	 * Dans le constructeur de cette classe on peut rajouter les templates de questions
@@ -69,14 +69,14 @@ public class MuzziQAPI {
 	 */
 	
 	public MuzziQAPI(){
-		this.templates.add(new QTemplate("Single","Artist","Quel artist a composé le single %%var%%?"));
+		this.templates.add(new QTemplate("Title","Artist","Quel artist a composé le single %%var%%?"));
 		this.templates.add(new QTemplate("Album","Artist","Quel artist a composé l'album %%var%%?"));
-		this.templates.add(new QTemplate("Year","Single", "Quel single est apparu en %%var%%?"));
+		this.templates.add(new QTemplate("Year","Title", "Quel single est apparu en %%var%%?"));
 		this.templates.add(new QTemplate("Year", "Album", "Quel album est apparu en %%var%%?"));
-		this.templates.add(new QTemplate("Artist","Single", "Lequel de ces singles est publié par %%var%%"));
+		this.templates.add(new QTemplate("Artist","Title", "Lequel de ces singles est publié par %%var%%"));
 		this.templates.add(new QTemplate("Artist","Album", "Lequel de ces albums est publié par %%var%%?"));
-		this.templates.add(new QTemplate("Genre","Single","Lequel de ces singles fait partie du genre %%var%%?"));
-		this.templates.add(new QTemplate("Single","Genre","De quel genre est le single %%var%%?"));
+		this.templates.add(new QTemplate("Genre","Title","Lequel de ces singles fait partie du genre %%var%%?"));
+		this.templates.add(new QTemplate("Title","Genre","De quel genre est le single %%var%%?"));
 	}
 	
 	@ApiMethod(name="fillDataStore",httpMethod = HttpMethod.GET)
@@ -179,7 +179,7 @@ public class MuzziQAPI {
 			
 			br.close();
 			
-			nrElemInDS += index;
+			//nrElemInDS += index;
 			logger.log(Level.INFO, "there are "+ nrElemInDS + " in Datastore");
 		}
 		catch (FileNotFoundException e)
