@@ -353,4 +353,33 @@ public class MuzziQAPI {
 		}
 	}
 	
+	
+	@ApiMethod(name="setHighScore",httpMethod = HttpMethod.GET)
+	public void setHighScore(int id, String name, String fname, int score){
+		Entity ent = new Entity("HighScore",index);
+		ent.setProperty("GoogleID", id);
+		ent.setProperty("Nom", name);
+		ent.setProperty("Prenom", fname);
+		ent.setProperty("Score", score);
+					
+		datastore.put(ent);
+	}
+
+	@ApiMethod(name="getHighScore",httpMethod = HttpMethod.GET)
+	private HighScore getHighScore(){
+		Query qHS = new Query("HighScore");
+		PreparedQuery pq = this.datastore.prepare(qHS);
+		Iterable<Entity> itEntity = pq.asIterable();
+		Iterator<Entity> it = itEntity.iterator();
+		List<Entity> listHS = new ArrayList<Entity>();
+		while(it.hasNext()){
+			Entity enths = it.next();
+			logger.log(level.INFO, "add() HS");
+			listHS.add(enths);	
+		}
+		return listHS;
+	}
+
+
+
 }
