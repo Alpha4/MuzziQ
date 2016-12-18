@@ -1,3 +1,6 @@
+package com.muzziq.utils;
+
+import java.lang.String;
 
 public class HighScore{
 
@@ -14,6 +17,39 @@ public class HighScore{
 	
 	}
 
-	// TODO getter & setter 
+	//getters
+	public int getGoogleID(){
+		return _googleID;
+	}
+	
+	public String getNom(){
+		return _nom;
+	}
+	
+	public String getPrenom(){
+		return _prenom;
+	}
+	
+	public int getScore() {
+		return _score;
+	}
+	
+	//setters
+	public void setGoogleID(int googleID){
+		_googleID = googleID;
+	}
+	
+	public void setNom( String name){
+		_nom = name;
+	}
+	
+	public void setPrenom( String fname){
+		_prenom = fname;
+	}
+	
+	public void setScore( String score) {
+		_score = score;
+	}
+	
 
 }
