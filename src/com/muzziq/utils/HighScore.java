@@ -4,12 +4,12 @@ import java.lang.String;
 
 public class HighScore{
 
-	private int _googleID;
+	private String _googleID;
 	private String _nom;
 	private String _prenom;
 	private int _score;
 
-	public HighScore(int gid, String name, String fname, int score){
+	public HighScore(String gid, String name, String fname, int score){
 		_googleID = gid;
 		_nom = name;
 		_prenom = fname;
@@ -18,7 +18,7 @@ public class HighScore{
 	}
 
 	//getters
-	public int getGoogleID(){
+	public String getGoogleID(){
 		return _googleID;
 	}
 	
@@ -35,7 +35,7 @@ public class HighScore{
 	}
 	
 	//setters
-	public void setGoogleID(int googleID){
+	public void setGoogleID(String googleID){
 		_googleID = googleID;
 	}
 	
