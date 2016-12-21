@@ -1,4 +1,4 @@
-package src.com.muzziq.api;
+package com.muzziq.api;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,12 +39,12 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.Stats;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import src.com.muzziq.utils.ResDatastore;
-import src.com.muzziq.utils.Quizz;
-import src.com.muzziq.utils.CorrectAnswer;
-import src.com.muzziq.utils.QTemplate;
-import src.com.muzziq.utils.Question;
-import src.com.muzziq.utils.HighScore;
+import com.muzziq.utils.ResDatastore;
+import com.muzziq.utils.Quizz;
+import com.muzziq.utils.CorrectAnswer;
+import com.muzziq.utils.QTemplate;
+import com.muzziq.utils.Question;
+import com.muzziq.utils.HighScore;
 
 
 

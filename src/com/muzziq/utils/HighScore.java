@@ -1,4 +1,4 @@
-package src.com.muzziq.utils;
+package com.muzziq.utils;
 
 import java.lang.String;
 

@@ -6,6 +6,7 @@
   "version" : "v1",
   "description" : "An API to manage music quizzes",
   "defaultVersion" : false,
+  "discovery" : [ "PUBLIC" ],
   "adapter" : {
     "bns" : "https://muzziq-148913.appspot.com/_ah/spi",
     "deadline" : 65.0,
@@ -32,7 +33,7 @@
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
       "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
-      "rosyMethod" : "src.com.muzziq.api.MuzziQAPI.getQuizz",
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.getQuizz",
       "request" : {
         "body" : "empty"
       },
@@ -47,7 +48,7 @@
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
       "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
-      "rosyMethod" : "src.com.muzziq.api.MuzziQAPI.verifyAnswer",
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.verifyAnswer",
       "request" : {
         "parameters" : {
           "id" : {
@@ -72,7 +73,7 @@
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
       "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
-      "rosyMethod" : "src.com.muzziq.api.MuzziQAPI.addHighScore",
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.addHighScore",
       "request" : {
         "parameters" : {
           "id" : {
@@ -105,7 +106,7 @@
       "scopes" : [ "https://www.googleapis.com/auth/userinfo.email" ],
       "audiences" : [ ],
       "clientIds" : [ "230619663769-99mc5h263pjsejb4ka8lb9v7ssvtd41r.apps.googleusercontent.com" ],
-      "rosyMethod" : "src.com.muzziq.api.MuzziQAPI.fillDataStore",
+      "rosyMethod" : "com.muzziq.api.MuzziQAPI.fillDataStore",
       "request" : {
         "parameters" : {
           "in" : {
@@ -175,19 +176,19 @@
       }
     },
     "methods" : {
-      "src.com.muzziq.api.MuzziQAPI.getQuizz" : {
+      "com.muzziq.api.MuzziQAPI.getQuizz" : {
         "response" : {
           "$ref" : "Quizz"
         }
       },
-      "src.com.muzziq.api.MuzziQAPI.verifyAnswer" : {
+      "com.muzziq.api.MuzziQAPI.verifyAnswer" : {
         "response" : {
           "$ref" : "CorrectAnswer"
         }
       },
-      "src.com.muzziq.api.MuzziQAPI.addHighScore" : {
+      "com.muzziq.api.MuzziQAPI.addHighScore" : {
       },
-      "src.com.muzziq.api.MuzziQAPI.fillDataStore" : {
+      "com.muzziq.api.MuzziQAPI.fillDataStore" : {
         "response" : {
           "$ref" : "ResDatastore"
         }

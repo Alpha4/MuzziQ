@@ -1,4 +1,4 @@
-package src.com.muzziq.test;
+package com.muzziq.test;
 
 import static org.junit.Assert.*;
 
@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import src.com.muzziq.utils.QTemplate;
-import src.com.muzziq.utils.Question;
+import com.muzziq.utils.QTemplate;
+import com.muzziq.utils.Question;
 
 public class QuestionTest {
 

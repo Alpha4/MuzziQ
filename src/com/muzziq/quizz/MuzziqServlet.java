@@ -1,4 +1,4 @@
-package src.com.muzziq.quizz;
+package com.muzziq.quizz;
 
 import java.io.IOException;
 import java.io.PrintWriter;
