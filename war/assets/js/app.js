@@ -1,17 +1,17 @@
 var app = angular.module('app',['ngRoute']).config(['$routeProvider','$locationProvider',
     function($routeProvider,$locationProvider){
       $routeProvider
-        .when('/home',{
+        .when('templates/home',{
           templateUrl: 'home.html',
           controller: 'menuCtrl',
           controllerAs: 'cont'
         })
-        .when('/ongame',{
+        .when('templates/ongame',{
           templateUrl: 'game.html',
           controller: 'gameCtrl',
           controllerAs: 'gcontrol'
         })
-        .when('/login',{
+        .when('templates/login',{
         	templateUrl: 'login.html',
         	controller: 'loginCtrl',
         	controllerAs: 'lctrl'
@@ -31,7 +31,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   console.log($location.url());
   if($location.url() == ""){
 	  console.log("change of ng-view");
-	  $location.path("/home");
+	  $location.path("templates/home");
   }
   this.$route = $route;
   
@@ -57,7 +57,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
 		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
 		  player.score = 0;
-		  $location.path("/home");
+		  $location.path("templates/home");
 		  $scope.$apply();
 	  });
   }
@@ -110,7 +110,7 @@ app.controller('loginCtrl',['$scope','$location','$route',function($scope,$locat
 		//$scope.user = googleUser.getBasicProfile().getName();
 		console.log($scope.auth2.isSignedIn.get());
 		$scope.isSignedIn = $scope.auth2.isSignedIn.get();
-		$location.path("/home");
+		$location.path("templates/home");
 		$scope.$apply();
 	}
 	
@@ -130,9 +130,9 @@ app.controller('loginCtrl',['$scope','$location','$route',function($scope,$locat
 		});
 		gapi.signin2.render('navbar-signin',{
 			'scope': 'email',
-			'width': 200,
+			'width': 100,
 			'height': 50,
-			'longtitle': true,
+			'longtitle': false,
 			'theme': 'dark',
 			'onsuccess': me.handleSuccess,
 			'onfailure': me.handleFailure
@@ -184,9 +184,9 @@ app.controller('menuCtrl',['$scope','$location','$route',function($scope,$locati
   this.play = function(){
     console.log("play() invoked");
     if($scope.isSignedIn === true){
-    	$location.path("/ongame");
+    	$location.path("templates/ongame");
     }else if($scope.isSignedIn === false){
-    	$location.path("/login");
+    	$location.path("templates/login");
     }
   };
 }]);
@@ -243,7 +243,7 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
   });
   
   if(this.player.name === ''){
-	  $location.path("/home");
+	  $location.path("templates/home");
   }
   
   
