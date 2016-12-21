@@ -1,3 +1,21 @@
+<header>
+    <div class="navbar-top navbar navbar-default navbar-fixed-top">
+        <div class="containeur-fluid">
+            <div class="row">
+                <div class="col-xs-1">
+                    <a id="home" href="#/home" > <img id="logo" src="assets/fonts/muzziq_logo.png" alt="logo" /> </a>
+                </div>
+                <div class="col-xs-offset-9 col-xs-1">
+                    <a id="hihgscore" href="#/highScore" > <h4> Highscores </h4> </a>
+                </div>
+                <div class="col-xs-1">
+                    <a> <div ng-show="isSignedIn == null" id="navbar-signin"></div> <div ng-hide="isSignedIn != null"> <button ng-click="gcontrol.signOut();">Sign out</button> <div> </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
 <div class="row">
     <div class="col-xs-offset-3 col-xs-6">
         <div class="home-j jumbotron">
