@@ -1,18 +1,61 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="app">
-  <head>
-    <meta charset="utf-8">
-    <title>Quizz Battle</title>
-    
-  </head>
-  <body ng-controller="mainControler as mCtrl">
-    <div>
-        <div ng-view></div>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.js"></script>
-    <script src="app.js"></script>
-    <script src="https://apis.google.com/js/client.js?onload=init"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-  </body>
+	<head>
+		<meta charset="utf-8">
+		<title>MuzziQ</title>
+
+		<link rel="stylesheet" type="text/css" href="stylesheet.css">
+
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-route.js"></script>
+		<script src="app.js"></script>
+		<script src="https://apis.google.com/js/client.js?onload=init"></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+		<link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+	
+	</head>
+
+	<body ng-controller="mainControler as mCtrl">
+
+		<header>
+			<div class="navbar-top navbar navbar-default navbar-fixed-top">
+				<div class="containeur-fluid">
+					<div class="row">
+						<div class="col-xs-1">
+							<a id="home" href="#/home" > <h4> &nbsp &nbsp MuzziQ </h4> </a>
+						</div>
+						<div class="col-xs-offset-9 col-xs-1">
+							<a id="hihgscore" href="#/highScore" > <h4> Highscores </h4> </a>
+						</div>
+						<div class="col-xs-1">
+							<a> <div ng-show="isSignedIn == null" id="navbar-signin"></div> <div ng-hide="isSignedIn != null"> <button ng-click="gcontrol.signOut();">Sign out</button> <div> </a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</header>
+
+		<div ng-view> </div>
+
+		<footer>
+			<div class="navbar navbar-default navbar-fixed-bottom">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-xs-6">
+							<h4> Designed by Killian, Aurélien, Andrei, Mario, and Sylvain </h4>
+						</div>
+						<div class="col-xs-offset-4 col-xs-2">
+							<h4> Project on github : <a href="https://github.com/Alpha4/MuzziQ" > <img id="github" src="assets/fonts/github.png" alt="github" /> </a>  </h4>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</footer>
+
+
+
+	</body>
+
 </html>

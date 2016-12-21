@@ -1,4 +1,4 @@
-package com.muzziq.api;
+package src.com.muzziq.api;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,11 +39,12 @@ import com.google.appengine.api.memcache.MemcacheServiceFactory;
 import com.google.appengine.api.memcache.Stats;
 import com.google.appengine.api.oauth.OAuthRequestException;
 import com.google.appengine.api.users.User;
-import com.muzziq.utils.ResDatastore;
-import com.muzziq.utils.Quizz;
-import com.muzziq.utils.CorrectAnswer;
-import com.muzziq.utils.QTemplate;
-import com.muzziq.utils.Question;
+import src.com.muzziq.utils.ResDatastore;
+import src.com.muzziq.utils.Quizz;
+import src.com.muzziq.utils.CorrectAnswer;
+import src.com.muzziq.utils.QTemplate;
+import src.com.muzziq.utils.Question;
+import src.com.muzziq.utils.HighScore;
 
 
 
@@ -355,33 +356,40 @@ public class MuzziQAPI {
 	
 	
 	@ApiMethod(name="addHighScore",httpMethod = HttpMethod.GET)
-	public void addHighScore(int id, String name, String fname, int score){
-		Entity ent = new Entity("HighScore",index);
+	public void addHighScore(@Named("id") int id, @Named("name") String name, @Named("fname") String fname, @Named("score")int score){
+		
+		Entity ent = new Entity("HighScore");
 		ent.setProperty("GoogleID", id);
 		ent.setProperty("Nom", name);
 		ent.setProperty("Prenom", fname);
 		ent.setProperty("Score", score);
 					
 		datastore.put(ent);
+		
 	}
 
+	
 	@ApiMethod(name="getHighScore",httpMethod = HttpMethod.GET)
 	private List<HighScore> getHighScore(){
+		/*
 		Query qHS = new Query("HighScore");
 		PreparedQuery pq = this.datastore.prepare(qHS);
 		HighScore hs = new HighScore(
-		Iterable<Entity> itEntity = pq.asIterable();
-		Iterator<Entity> it = itEntity.iterator();
-		List<HighScore> listHS = new ArrayList<HighScore>();
-		while(it.hasNext()){
-			Entity enths = it.next();
-			logger.log(level.INFO, "add() HS");
-			HighScore hs = new HighScore(enths.getProperty("GoogleID"),enths.getProperty("Nom"),enths.getProperty("Prenom"),enths.getProperty("Score"));
-			listHS.add(hs);	
-		}
+				Iterable<Entity> itEntity = pq.asIterable();
+				Iterator<Entity> it = itEntity.iterator();
+				List<HighScore> listHS = new ArrayList<HighScore>();
+				while(it.hasNext()){
+					Entity enths = it.next();
+					logger.log(level.INFO, "add() HS");
+					HighScore hs = new HighScore(enths.getProperty("GoogleID"),enths.getProperty("Nom"),enths.getProperty("Prenom"),enths.getProperty("Score"));
+					listHS.add(hs);	
+				}
+		return listHS;
+		*/
+		
+		List<HighScore> listHS = new ArrayList<HighScore>(); 
 		return listHS;
 	}
-
-
+	
 
 }

@@ -1,4 +1,4 @@
-package com.muzziq.utils;
+package src.com.muzziq.utils;
 
 import java.lang.String;
 
@@ -47,7 +47,7 @@ public class HighScore{
 		_prenom = fname;
 	}
 	
-	public void setScore( String score) {
+	public void setScore( int score) {
 		_score = score;
 	}
 	

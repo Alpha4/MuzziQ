@@ -1,4 +1,4 @@
-package com.muzziq.test;
+package src.com.muzziq.test;
 
 import static org.junit.Assert.*;
 
@@ -7,8 +7,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.muzziq.utils.QTemplate;
-import com.muzziq.utils.Question;
+import src.com.muzziq.utils.QTemplate;
+import src.com.muzziq.utils.Question;
 
 public class QuestionTest {
 
@@ -44,6 +44,7 @@ public class QuestionTest {
 		}
 		// verify failing tests
 		try{
+			@SuppressWarnings("unused")
 			Question myQuestion3 = new Question(3,qtempl,lst,answers);
 			fail("expected RuntimeError");
 		}catch(RuntimeException e){
@@ -52,6 +53,7 @@ public class QuestionTest {
 		
 		lst.remove(1);
 		try{
+			@SuppressWarnings("unused")
 			Question myQuestion4 = new Question(4,qtempl1,lst,answers);
 			fail("expected RuntimeError");
 		}catch(RuntimeException e){

@@ -1,4 +1,4 @@
-package com.muzziq.utils;
+package src.com.muzziq.utils;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.muzziq.utils;
+package src.com.muzziq.utils;
 
 public class ResDatastore {
 	private boolean isOk;

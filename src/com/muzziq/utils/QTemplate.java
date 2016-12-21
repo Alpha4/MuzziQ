@@ -1,4 +1,4 @@
-package com.muzziq.utils;
+package src.com.muzziq.utils;
 
 public class QTemplate {
 	//atribut permetant de connaitre quelle types de variables il faut chercher dans le datastore pour les remlpacer dans le template
