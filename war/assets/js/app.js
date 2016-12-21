@@ -73,6 +73,13 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 	  })
   }
   
+  $scope.addHighScore = function(score){
+	  console.log("inside addHighScore method");
+	  gapi.client.muzziqapi.addHighScore({"id":$scope.auth2.currentUser.get().getId(),"name":$scope.auth2.currentUser.get().getBasicProfile().getFamilyName(),"fname":$scope.auth2.currentUser.get().getBasicProfile().getFamilyName(),"score":score}).execute(function(response){
+		  console.log("call to api function to add HighScore");
+	  })
+  }
+  
   $scope.auth2=null;
   
   //initialisation de gapi
@@ -219,6 +226,10 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
 		  console.log("id = "+this.questId);
 		  console.log(this.question);
 		  console.log(this.ind);
+	  }else{
+		  $scope.addHighScore(this.player.score);
+		  this.player.score = 0;
+		  $location.path("/home");
 	  }
   }
   

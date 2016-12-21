@@ -351,9 +351,15 @@ public class MuzziQAPI {
 	@ApiMethod(name="verifyAnswer")
 	public CorrectAnswer verifyAnswer(@Named("id") int id, @Named("answer") String answer, User user) throws OAuthRequestException, EntityNotFoundException{
 		if(user != null){
-			Key k = (Key) syncCache.get(id);
+			logger.log(Level.INFO, "id= "+id+ " ; answer = "+answer);
+			logger.log(Level.INFO,"id = "+id);
+			Key k = (Key) syncCache.get(id-1);
+			logger.log(Level.INFO,"id = "+k.getId());
 			Entity e = datastore.get(k);
 			Map<String,Object> map = e.getProperties();
+			for(Iterator<Object> it = map.values().iterator();it.hasNext();){
+				logger.log(Level.INFO,it.next().toString());
+			}
 			if(map.values().contains(answer)){
 				return new CorrectAnswer(true);
 			}else{
@@ -368,6 +374,7 @@ public class MuzziQAPI {
 	@ApiMethod(name="addHighScore",httpMethod = HttpMethod.GET)
 	public void addHighScore(@Named("id") String id, @Named("name") String name, @Named("fname") String fname, @Named("score")int score,User user) throws OAuthRequestException{
 		if(user != null){
+			logger.log(Level.INFO,"id="+id+ " ; name= "+name+ " ; score= "+score);
 			Entity ent = new Entity("HighScore");
 			ent.setProperty("GoogleID", id);
 			ent.setProperty("Nom", name);
