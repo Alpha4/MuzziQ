@@ -91,6 +91,28 @@
 
 /* OTHERS */
 
-.jumbotron{
+.home-j
+{
 	margin-top: 100px;
+	box-shadow: 0 8px 16px -6px black;
+	border-radius: 20px;
+}
+
+.navbar-top
+{
+
+}
+
+#github 
+{
+	width : 30px;
+	height : 30px;
+}
+
+#logo
+{
+
+	margin-left: 10px;
+	width : 80px;
+	height : 50px;	
 }

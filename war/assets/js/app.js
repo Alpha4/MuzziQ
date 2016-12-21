@@ -1,18 +1,18 @@
 var app = angular.module('app',['ngRoute']).config(['$routeProvider','$locationProvider',
     function($routeProvider,$locationProvider){
       $routeProvider
-        .when('templates/home',{
-          templateUrl: 'home.html',
+        .when('/home',{
+          templateUrl: 'templates/home.html',
           controller: 'menuCtrl',
           controllerAs: 'cont'
         })
-        .when('templates/ongame',{
-          templateUrl: 'game.html',
+        .when('/ongame',{
+          templateUrl: 'templates/game.html',
           controller: 'gameCtrl',
           controllerAs: 'gcontrol'
         })
-        .when('templates/login',{
-        	templateUrl: 'login.html',
+        .when('/login',{
+        	templateUrl: 'templates/login.html',
         	controller: 'loginCtrl',
         	controllerAs: 'lctrl'
         });
@@ -31,7 +31,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   console.log($location.url());
   if($location.url() == ""){
 	  console.log("change of ng-view");
-	  $location.path("templates/home");
+	  $location.path("/home");
   }
   this.$route = $route;
   
@@ -52,12 +52,13 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   };
   
   $scope.signOut = function(){
+  		console.log("try sign out")
 	  $scope.auth2.signOut().then(function(){
 		  console.log("User signed out");
 		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
 		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
 		  player.score = 0;
-		  $location.path("templates/home");
+		  $location.path("/home");
 		  $scope.$apply();
 	  });
   }
@@ -110,7 +111,7 @@ app.controller('loginCtrl',['$scope','$location','$route',function($scope,$locat
 		//$scope.user = googleUser.getBasicProfile().getName();
 		console.log($scope.auth2.isSignedIn.get());
 		$scope.isSignedIn = $scope.auth2.isSignedIn.get();
-		$location.path("templates/home");
+		$location.path("/home");
 		$scope.$apply();
 	}
 	
@@ -184,9 +185,9 @@ app.controller('menuCtrl',['$scope','$location','$route',function($scope,$locati
   this.play = function(){
     console.log("play() invoked");
     if($scope.isSignedIn === true){
-    	$location.path("templates/ongame");
+    	$location.path("ongame");
     }else if($scope.isSignedIn === false){
-    	$location.path("templates/login");
+    	$location.path("/login");
     }
   };
 }]);
@@ -243,7 +244,7 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
   });
   
   if(this.player.name === ''){
-	  $location.path("templates/home");
+	  $location.path("/home");
   }
   
   
