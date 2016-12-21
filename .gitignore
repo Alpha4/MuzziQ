@@ -2,6 +2,7 @@
 .settings
 /bin
 *.class
+war/WEB-INF/muzziqapi-v1.api
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
