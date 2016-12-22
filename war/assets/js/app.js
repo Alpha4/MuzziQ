@@ -263,7 +263,7 @@ app.controller('menuCtrl',['$scope','$location','$route',function($scope,$locati
     console.log("play() invoked");
     if($scope.auth2.isSignedIn.get() === true){
     	$location.path("/ongame");
-    }else if($scope.auth2/isSignedIn.get() === false){
+    }else if($scope.auth2.isSignedIn.get() === false){
     	this.signIn(callback);
     }
   };
