@@ -372,15 +372,25 @@ public class MuzziQAPI {
 	
 	
 	@ApiMethod(name="addHighScore",httpMethod = HttpMethod.GET)
-	public void addHighScore(@Named("id") String id, @Named("name") String name, @Named("fname") String fname, @Named("score")int score,User user) throws OAuthRequestException{
+	public void addHighScore(@Named("score")int score,User user) throws OAuthRequestException{
 		if(user != null){
-			logger.log(Level.INFO,"id="+id+ " ; name= "+name+ " ; score= "+score);
-			Entity ent = new Entity("HighScore");
-			ent.setProperty("GoogleID", id);
-			ent.setProperty("Nom", name);
-			ent.setProperty("Prenom", fname);
-			ent.setProperty("Score", score);
-			datastore.put(ent);
+			Filter f = new FilterPredicate("GoogleID",FilterOperator.EQUAL, user.getUserId());
+			Query playerq = new Query("HighScore").setFilter(f);
+			PreparedQuery pp = this.datastore.prepare(playerq);
+			Entity player = pp.asSingleEntity();
+			if(player == null){
+				logger.log(Level.INFO,"Player is first time in the datastore; score= "+score);
+				Entity ent = new Entity("HighScore");
+				ent.setProperty("GoogleID", user.getUserId());
+				ent.setProperty("Nom", user.getNickname());
+				ent.setProperty("Score", score);
+				datastore.put(ent);
+			}else{
+				if(score > (long) player.getProperty("Score")){
+					player.setProperty("Score",score );
+					datastore.put(player);
+				}
+			}
 		}else{
 			throw new OAuthRequestException("user should be not null");
 		}
@@ -399,23 +409,26 @@ public class MuzziQAPI {
 			Hss highScores = new Hss();
 			while(it.hasNext()){
 				Entity e = it.next();
-				String gid = (String) e.getProperty("GoogleID");
+				//String gid = (String) e.getProperty("GoogleID");
 				String name = (String)e.getProperty("Nom");
-				String fname = (String)e.getProperty("Prenom");
-				int score =(int) e.getProperty("Score");
-				HighScore hs = new HighScore(gid,name,fname,score);
+				long score =(long) e.getProperty("Score");
+				HighScore hs = new HighScore(name,score);
 				highScores.add(hs);
 			}
 			Filter f = new FilterPredicate("GoogleID",FilterOperator.EQUAL, user.getUserId());
 			Query playerq = new Query("HighScore").setFilter(f);
 			PreparedQuery pp = this.datastore.prepare(playerq);
-			Entity player = pp.asSingleEntity();
-			String gidd = (String) player.getProperty("GoogleID");
-			String namee = (String)player.getProperty("Nom");
-			String fnamee = (String)player.getProperty("Prenom");
-			int scoree =(int) player.getProperty("Score");
-			HighScore phs = new HighScore(gidd,namee,fnamee,scoree);
-			highScores.add(phs);
+			Iterable<Entity> players = pp.asIterable(FetchOptions.Builder.withLimit(1));
+			Entity player = players.iterator().next();
+			if(player==null){
+				logger.log(Level.INFO,"l'id google : "+user.getUserId()+" non trouvé");
+			}else{
+				//String gidd = (String) player.getProperty("GoogleID");
+				String namee = (String)player.getProperty("Nom");
+				long scoree =(long) player.getProperty("Score");
+				HighScore phs = new HighScore(namee,scoree);
+				highScores.add(phs);
+			}
 			return highScores;
 		}else{
 			Query qHS = new Query("HighScore").addSort("Score",SortDirection.DESCENDING);
@@ -425,11 +438,10 @@ public class MuzziQAPI {
 			Hss highScores = new Hss();
 			while(it.hasNext()){
 				Entity e = it.next();
-				String gid = (String) e.getProperty("GoogleID");
+				//String gid = (String) e.getProperty("GoogleID");
 				String name = (String)e.getProperty("Nom");
-				String fname = (String)e.getProperty("Prenom");
-				int score =(int) e.getProperty("Score");
-				HighScore hs = new HighScore(gid,name,fname,score);
+				long score =(long) e.getProperty("Score");
+				HighScore hs = new HighScore(name,score);
 				highScores.add(hs);
 			}
 			return highScores;
