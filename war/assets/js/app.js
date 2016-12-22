@@ -56,7 +56,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 	  $scope.auth2.signOut().then(function(){
 		  console.log("User signed out");
 		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
-		  //$scope.isSignedIn = $scope.auth2.isSignedIn.get();
+		  state.isSignedIn = $scope.auth2.isSignedIn.get();
 		  player.score = 0;
 		  $location.path("/home");
 		  $scope.$apply();
@@ -83,7 +83,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   $scope.auth2=null;
   
   
-  
+  /*
   $scope.handleSuccess = function(googleUser){
 	  console.log("logged in as"+ googleUser.getBasicProfile().getName());
 	  //$scope.user = googleUser.getBasicProfile().getName();
@@ -91,7 +91,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
 	  player.name = googleUser.getBasicProfile().getName();
 	  player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
 	  
-	  //$scope.isSignedIn = $scope.auth2.isSignedIn.get();
+	  state.isSignedIn = $scope.auth2.isSignedIn.get();
 	  //$location.path("/home");
 	  $scope.$apply();
   }
@@ -99,40 +99,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   $scope.handleFailure = function(){
 	  console.log("handleFailure()");
   }
-  
-  $scope.signIn = function(callback){
-	  console.log("inside signIn function");
-	  var signIn = $scope.auth2.signIn({
-		  'scope': 'email'
-	  });
-	  $scope.signIn = $scope.auth2.isSignedIn.get();
-	  console.log("user is signed in");
-	  signIn.then(callback);
-	  $scope.$apply;
-  }
-  
-  
-  $scope.render = function(){
-		gapi.signin2.render('my-signin',{
-			'scope': 'email',
-			'width': 200,
-			'height': 50,
-			'longtitle': true,
-			'theme': 'dark',
-			'onsuccess': $scope.handleSuccess,
-			'onfailure': $scope.handleFailure
-		});
-		gapi.signin2.render('navbar-signin',{
-			'scope': 'email',
-			'width': 100,
-			'height': 50,
-			'longtitle': false,
-			'theme': 'dark',
-			'onsuccess': $scope.handleSuccess,
-			'onfailure': $scope.handleFailure
-		});
-	}
-  
+  */
   
   
   //initialisation de gapi
@@ -153,72 +120,27 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   };
 }]);
 
-/*
-app.controller('loginCtrl',['$scope','$location','$route',function($scope,$location,$route){
-	this.$route=$route;
-	this.signOut =$scope.signOut;
-	this.isSignedIn = $scope.isSignedIn;
-	var me = this;
-	$scope.$watch('auth2',function(newVal,oldVal){
-		if(newVal !== oldVal){
-			console.log("inside $watch method");
-			$scope.auth2.then(function(){
-				me.render();
-			});
-		}
-	});
-	
-	this.handleSuccess = function(googleUser){
-		console.log("logged in as"+ googleUser.getBasicProfile().getName());
-		//$scope.user = googleUser.getBasicProfile().getName();
-		console.log($scope.auth2.isSignedIn.get());
-		$scope.isSignedIn = $scope.auth2.isSignedIn.get();
-		$location.path("/home");
-		$scope.$apply();
-	}
-	
-	this.handleFailure = function(){
-		console.log("handleFailure()");
-	}
-	
-	this.render = function(){
-		gapi.signin2.render('my-signin',{
-			'scope': 'email',
-			'width': 200,
-			'height': 50,
-			'longtitle': true,
-			'theme': 'dark',
-			'onsuccess': me.handleSuccess,
-			'onfailure': me.handleFailure
-		});
-		gapi.signin2.render('navbar-signin',{
-			'scope': 'email',
-			'width': 100,
-			'height': 50,
-			'longtitle': false,
-			'theme': 'dark',
-			'onsuccess': me.handleSuccess,
-			'onfailure': me.handleFailure
-		});
-	}
-	
-	if($scope.auth2 != null){
-		this.render();
-	}
-	
-	
-}]);
-
-*/
 
 //controlleur pour la page d'accueil (homepage) --- /home ---
 app.controller('menuCtrl',['$scope','$location','$route',function($scope,$location,$route){
   this.$route = $route;
   this.player = player;
   this.signOut = $scope.signOut;
-  this.isSignedIn = null;
+  this.isSignedIn = false;
   console.log("inside home controller isSignedIn ="+this.isSignedIn);
-  this.signIn = $scope.signIn;
+  this.signIn = function(){
+	  console.log("inside signIn function");
+	  var signIn = $scope.auth2.signIn({
+		  'scope': 'email'
+	  }).then(function(){
+		  this.isSignedIn = $scope.auth2.isSignedIn.get();
+		  this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
+		  this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
+		  console.log("user is signed in");
+	  });
+	  this.isSignedIn = $scope.auth2.isSignedIn.get();
+  }
+  
   var me = this;
   $scope.$watch('auth2',function(newVal,oldVal){
 	  if(newVal !== oldVal){
@@ -230,41 +152,35 @@ app.controller('menuCtrl',['$scope','$location','$route',function($scope,$locati
 			  me.text = "Play Game";
 		  }else if(me.isSignedIn === false){
 			  me.text = "Log in";
-			  $scope.render();
 		  }
 	  }
   });
   
-  
+  console.log("in home controller");
   if($scope.auth2 !== null){
 	  this.isSignedIn = $scope.auth2.isSignedIn.get();
 	  console.log("not in $scope.$watch but signedIn ="+this.isSignedIn)
-	  if($scope.isSignedIn === true){
+	  if(this.isSignedIn === true){
 		  console.log("signedIn === true");
 		  this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
-		  cout(this.player.name);
+		  console.log(this.player.name);
 		  this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
 		  this.text = "Play Game";
-	  }else if($scope.isSignedIn === false){
+	  }else if(this.isSignedIn === false){
 		  console.log("signedIn === false");
 		  this.text = "Log in";
-		  $scope.render();
 	  }
   }
   
-  var callback = function(){
-	  console.log("inside callback()!!!");
-	  this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
-	  this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
-	  $location.path("/ongame");
-  }
   
   this.play = function(){
     console.log("play() invoked");
     if($scope.auth2.isSignedIn.get() === true){
+    	this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
+  	  	this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
     	$location.path("/ongame");
     }else if($scope.auth2.isSignedIn.get() === false){
-    	this.signIn(callback);
+    	this.signIn();
     }
   };
 }]);
@@ -282,6 +198,7 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
   this.hideValidate = false;
   this.isSignedIn = $scope.auth2.isSignedIn.get();
   console.log("signedIn ? :"+this.isSignedIn);
+  this.signIn = $scope.signIn;
   
   //fonction qui modifie le modele en passant à la question suivante
   this.onclick = function(){
@@ -356,4 +273,8 @@ var player={
   score:0,
   imageUrl:''
 };
+
+var state={
+	isSignedIn:false
+}
 
