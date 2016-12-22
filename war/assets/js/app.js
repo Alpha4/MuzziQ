@@ -38,7 +38,7 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   //definition des variables pouvant etre appellés dans les nested controllers(menuCtrl,gameCtrl)
   $scope.questions = null;
   $scope.ind = 0;
-  $scope.isSignedIn = null;
+  //$scope.isSignedIn = false;
   $scope.isCurrentAnswerCorrect = null;
   
   //fonction appelant gapi.client.muzziqapi pour demander le quizz
@@ -52,11 +52,11 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   };
   
   $scope.signOut = function(){
-  		console.log("try sign out")
+  		console.log("try sign out");
 	  $scope.auth2.signOut().then(function(){
 		  console.log("User signed out");
 		  console.log("isConnected : "+$scope.auth2.isSignedIn.get());
-		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
+		  //$scope.isSignedIn = $scope.auth2.isSignedIn.get();
 		  player.score = 0;
 		  $location.path("/home");
 		  $scope.$apply();
@@ -82,9 +82,62 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   
   $scope.auth2=null;
   
+  
+  
+  $scope.handleSuccess = function(googleUser){
+	  console.log("logged in as"+ googleUser.getBasicProfile().getName());
+	  //$scope.user = googleUser.getBasicProfile().getName();
+	  console.log($scope.auth2.isSignedIn.get());
+	  player.name = googleUser.getBasicProfile().getName();
+	  player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
+	  
+	  //$scope.isSignedIn = $scope.auth2.isSignedIn.get();
+	  //$location.path("/home");
+	  $scope.$apply();
+  }
+  
+  $scope.handleFailure = function(){
+	  console.log("handleFailure()");
+  }
+  
+  $scope.signIn = function(callback){
+	  console.log("inside signIn function");
+	  var signIn = $scope.auth2.signIn({
+		  'scope': 'email'
+	  });
+	  $scope.signIn = $scope.auth2.isSignedIn.get();
+	  console.log("user is signed in");
+	  signIn.then(callback);
+	  $scope.$apply;
+  }
+  
+  
+  $scope.render = function(){
+		gapi.signin2.render('my-signin',{
+			'scope': 'email',
+			'width': 200,
+			'height': 50,
+			'longtitle': true,
+			'theme': 'dark',
+			'onsuccess': $scope.handleSuccess,
+			'onfailure': $scope.handleFailure
+		});
+		gapi.signin2.render('navbar-signin',{
+			'scope': 'email',
+			'width': 100,
+			'height': 50,
+			'longtitle': false,
+			'theme': 'dark',
+			'onsuccess': $scope.handleSuccess,
+			'onfailure': $scope.handleFailure
+		});
+	}
+  
+  
+  
   //initialisation de gapi
   window.init = function(){
-	  console.log("calling window.init()")
+	  console.log("calling window.init()");
 	  var rootApi = "https://muzziq-148913.appspot.com/_ah/api/";
 	  gapi.client.load("muzziqapi","v1",function(){
 		  console.log("gapi is loaded!");
@@ -100,9 +153,11 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   };
 }]);
 
-
+/*
 app.controller('loginCtrl',['$scope','$location','$route',function($scope,$location,$route){
 	this.$route=$route;
+	this.signOut =$scope.signOut;
+	this.isSignedIn = $scope.isSignedIn;
 	var me = this;
 	$scope.$watch('auth2',function(newVal,oldVal){
 		if(newVal !== oldVal){
@@ -154,47 +209,62 @@ app.controller('loginCtrl',['$scope','$location','$route',function($scope,$locat
 	
 }]);
 
+*/
 
-//controlleur pour la page d'accueil (homepage)
+//controlleur pour la page d'accueil (homepage) --- /home ---
 app.controller('menuCtrl',['$scope','$location','$route',function($scope,$location,$route){
   this.$route = $route;
   this.player = player;
   this.signOut = $scope.signOut;
+  this.isSignedIn = null;
+  console.log("inside home controller isSignedIn ="+this.isSignedIn);
+  this.signIn = $scope.signIn;
   var me = this;
   $scope.$watch('auth2',function(newVal,oldVal){
 	  if(newVal !== oldVal){
-		  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
-		  me.isSignedIn = $scope.isSignedIn;
-		  if($scope.isSignedIn === true){
+		  me.isSignedIn = $scope.auth2.isSignedIn.get();
+		  console.log("inside auth2 watch; signedIn ="+me.isSignedIn);
+		  if(me.isSignedIn === true){
 			  me.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
 			  me.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
 			  me.text = "Play Game";
-		  }else if($scope.isSignedIn === false){
+		  }else if(me.isSignedIn === false){
 			  me.text = "Log in";
+			  $scope.render();
 		  }
 	  }
   });
   
+  
   if($scope.auth2 !== null){
-	  $scope.isSignedIn = $scope.auth2.isSignedIn.get();
-	  this.isSignedIn = $scope.isSignedIn;
+	  this.isSignedIn = $scope.auth2.isSignedIn.get();
+	  console.log("not in $scope.$watch but signedIn ="+this.isSignedIn)
 	  if($scope.isSignedIn === true){
+		  console.log("signedIn === true");
 		  this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
+		  cout(this.player.name);
 		  this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
 		  this.text = "Play Game";
 	  }else if($scope.isSignedIn === false){
+		  console.log("signedIn === false");
 		  this.text = "Log in";
+		  $scope.render();
 	  }
   }
   
-  
+  var callback = function(){
+	  console.log("inside callback()!!!");
+	  this.player.name = $scope.auth2.currentUser.get().getBasicProfile().getName();
+	  this.player.imageUrl = $scope.auth2.currentUser.get().getBasicProfile().getImageUrl();
+	  $location.path("/ongame");
+  }
   
   this.play = function(){
     console.log("play() invoked");
-    if($scope.isSignedIn === true){
-    	$location.path("ongame");
-    }else if($scope.isSignedIn === false){
-    	$location.path("/login");
+    if($scope.auth2.isSignedIn.get() === true){
+    	$location.path("/ongame");
+    }else if($scope.auth2/isSignedIn.get() === false){
+    	this.signIn(callback);
     }
   };
 }]);
@@ -210,6 +280,8 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
   this.signOut = $scope.signOut;
   this.chosenAnswer = null;
   this.hideValidate = false;
+  this.isSignedIn = $scope.auth2.isSignedIn.get();
+  console.log("signedIn ? :"+this.isSignedIn);
   
   //fonction qui modifie le modele en passant à la question suivante
   this.onclick = function(){
