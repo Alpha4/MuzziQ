@@ -389,7 +389,7 @@ public class MuzziQAPI {
 
 	
 	@ApiMethod(name="getHighScore",httpMethod = HttpMethod.GET)
-	private Hss getHighScore(User user){
+	public Hss getHighScore(User user){
 		
 		if(user != null){
 			Query qHS = new Query("HighScore").addSort("Score",SortDirection.DESCENDING);
