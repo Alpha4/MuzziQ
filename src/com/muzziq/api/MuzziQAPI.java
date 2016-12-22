@@ -415,6 +415,7 @@ public class MuzziQAPI {
 			String fnamee = (String)player.getProperty("Prenom");
 			int scoree =(int) player.getProperty("Score");
 			HighScore phs = new HighScore(gidd,namee,fnamee,scoree);
+			highScores.add(phs);
 			return highScores;
 		}else{
 			Query qHS = new Query("HighScore").addSort("Score",SortDirection.DESCENDING);
