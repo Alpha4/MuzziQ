@@ -1,0 +1,36 @@
+<header>
+	<div class="navbar-top navbar navbar-default navbar-fixed-top">
+		<div class="containeur-fluid">
+			<div class="row">
+				<div class="col-xs-1">
+					<a id="home" href="#/home" > <img id="logo" src="assets/fonts/muzziq_logo.png" alt="logo" /> </a>
+				</div>
+				<div class="col-xs-offset-9 col-xs-1">
+					<a id="hihgscore" href="#/highScore" > <h4> Highscores </h4> </a>
+				</div>
+				<div class="col-xs-1">
+					<a> <div ng-hide="cont.isSignedIn" id="navbar-signin"><button ng-click="cont.signIn()">Sign In</button></div> <div ng-show="cont.isSignedIn"> <button ng-click="cont.signOut();">Sign out</button> <div> </a>
+				</div>
+			</div>
+		</div>
+	</div>
+</header>
+
+<div class="row">
+    <div class="col-xs-offset-3 col-xs-6">
+        <div class="home-j jumbotron">
+            <div class="row">
+                <div class="col-xs-offset-4 col-xs-9">
+                	<div class="row">
+                		<div class="col-sm-6">Name</div> 
+						<div class="col-sm-6">Score</div>
+                	</div>
+                    <div class="row" ng-repeat="hs in hsctrl.highScores">
+						<div class="col-sm-6">{{hs.nom}}</div> 
+						<div class="col-sm-6">{{hs.score}}</div>
+					</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

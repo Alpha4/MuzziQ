@@ -6,7 +6,7 @@
 					<a id="home" href="#/home" > <img id="logo" src="assets/fonts/muzziq_logo.png" alt="logo" /> </a>
 				</div>
 				<div class="col-xs-offset-9 col-xs-1">
-					<a id="hihgscore" href="#/highScore" > <h4> Highscores </h4> </a>
+					<div id="hihgscore" ng-click="cont.listHighScores()" > <h4> Highscores </h4> </div>
 				</div>
 				<div class="col-xs-1">
 					<a> <div ng-hide="cont.isSignedIn" id="navbar-signin"><button ng-click="cont.signIn()">Sign In</button></div> <div ng-show="cont.isSignedIn"> <button ng-click="cont.signOut();">Sign out</button> <div> </a>

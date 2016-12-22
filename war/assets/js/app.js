@@ -11,10 +11,10 @@ var app = angular.module('app',['ngRoute']).config(['$routeProvider','$locationP
           controller: 'gameCtrl',
           controllerAs: 'gcontrol'
         })
-        .when('/login',{
-        	templateUrl: 'templates/login.html',
-        	controller: 'loginCtrl',
-        	controllerAs: 'lctrl'
+        .when('/highscores',{
+        	templateUrl: 'templates/highscores.html',
+        	controller: 'highscoresCtrl',
+        	controllerAs: 'hsctrl'
         });
 }]);
 
@@ -75,9 +75,21 @@ app.controller('mainControler',['$scope','$route','$location','$window',function
   
   $scope.addHighScore = function(score){
 	  console.log("inside addHighScore method");
-	  gapi.client.muzziqapi.addHighScore({"id":$scope.auth2.currentUser.get().getId(),"name":$scope.auth2.currentUser.get().getBasicProfile().getFamilyName(),"fname":$scope.auth2.currentUser.get().getBasicProfile().getFamilyName(),"score":score}).execute(function(response){
+	  gapi.client.muzziqapi.addHighScore({"score":score}).execute(function(response){
 		  console.log("call to api function to add HighScore");
 	  })
+  }
+  
+  $scope.highScores = null;
+  
+  $scope.getHighScores = function(){
+	  console.log("inside getHighScores method ");
+	  gapi.client.muzziqapi.getHighScore().execute(function(response){
+		  console.log("call to api function to list highscores");
+		  console.log(response);
+		  $scope.highScores = response.listHs;
+		  $scope.$apply();
+	  });
   }
   
   $scope.auth2=null;
@@ -183,6 +195,11 @@ app.controller('menuCtrl',['$scope','$location','$route',function($scope,$locati
     	this.signIn();
     }
   };
+  
+  this.listHighScores = function(){
+	  $location.path("/highscores");
+  }
+  
 }]);
 
 
@@ -267,6 +284,27 @@ app.controller('gameCtrl',['$location','$scope','$route',function($location,$sco
   });
   
 }]);
+
+
+app.controller("highscoresCtrl", ["$location", "$scope", "$route", function($location,$scope,$route){
+	this.isSignedIn = $scope.auth2.isSignedIn.get();
+	this.signOut = $scope.signOut;
+	this.highScores = $scope.highScores;
+	
+	$scope.getHighScores();
+	var me = this;
+	$scope.$watch("highScores",function(newVal,oldVal){
+		  if(newVal !== oldVal){
+			  console.log("newVal = "+newVal);
+			  console.log("oldVal = "+oldVal);
+			  console.log("$scope.highScores = "+$scope.highScores);
+			  me.highScores = $scope.highScores;
+		  }
+	  });
+}]);
+
+
+
 
 var player={
   name:'',
